@@ -23,13 +23,40 @@ CREATE OBJECTTYPE FFUser (userName STRING, firstName STRING, lastName STRING, em
 CREATE ALIAS ON OBJECTTYPE FFUser GRABBAG BackReferences.FFUserGroup.users AS memberOfGroups
 CREATE OBJECTTYPE FFUserGroup (groupName STRING, users GRABBAG /FFUser)
 CREATE OBJECTTYPE FFNotificationID (idType STRING, idValue STRING)
-
+CREATE OBJECTTYPE Customer (user REFERENCE /FFUser, address REFERENCE /Addresses, phone STRING, avatar /Avatars)
+CREATE OBJECTTYPE Product (name STRING, description STRING, sku STRING, qrcode BYTEARRAY, mfg REFERENCE /Manufacturers, vendor GRABBAG /Vendors, gallery GRABBAG /ProductImages)
+CREATE OBJECTTYPE OrderLine (order REFERENCE /Orders, product REFERENCE /Products, vendor REFERENCE /Vendors, quantity NUMERIC, price NUMERIC, total NUMERIC)
+CREATE OBJECTTYPE Order (customer REFERENCE /Customers, total NUMERIC, placedAt REFERENCE /Locations)
+CREATE OBJECTTYPE Vendor (name STRING, address REFERENCE /Addresses, providers REFERENCE /FFUserGroup, admins REFERENCE /FFUserGroup)
+CREATE OBJECTTYPE Manufacturer (name STRING, address REFERENCE /Addresses, providers REFERENCE /FFUserGroup, admins REFERENCE /FFUserGroup)
+CREATE OBJECTTYPE Address (street STRING, city STRING, state STRING, postCode STRING, geo GEOLOCATION)
+CREATE OBJECTTYPE Account (customer REFERENCE /Customers, paymentMethod REFERENCE /PaymentMethods)
+CREATE OBJECTTYPE ProductImage (image BYTEARRAY, product REFERENCE /Products)
+CREATE OBJECTTYPE Avatar (image BYTEARRAY)
+CREATE OBJECTTYPE Location (geo GEOLOCATION)
+CREATE OBJECTTYPE Rating (relatesTo REFERENCE, geo REFERENCE /Locations)
+CREATE OBJECTTYPE Comment (relatesTo REFERENCE, comment STRING, geo REFERENCE /Locations)
+CREATE OBJECTTYPE Like (relatesTo REFERENCE)
 #
 # Collection Resources
 #
 CREATE COLLECTION /FFUser OBJECTTYPE FFUser
 CREATE COLLECTION /FFUserGroup OBJECTTYPE FFUserGroup
 CREATE COLLECTION /FFNotificationID OBJECTTYPE FFNotificationID
+CREATE COLLECTION /Customers OBJECTTYPE Customer
+CREATE COLLECTION /Products OBJECTTYPE Product
+CREATE COLLECTION /OrderLines OBJECTTYPE OrderLine
+CREATE COLLECTION /Orders OBJECTTYPE Order
+CREATE COLLECTION /Vendors OBJECTTYPE Vendor
+CREATE COLLECTION /Manufacturers OBJECTTYPE Manufacturer
+CREATE COLLECTION /Addresses OBJECTTYPE Address
+CREATE COLLECTION /Accounts OBJECTTYPE Account
+CREATE COLLECTION /ProductImages OBJECTTYPE ProductImage
+CREATE COLLECTION /Avatars OBJECTTYPE Avatar
+CREATE COLLECTION /Ratings OBJECTTYPE Rating
+CREATE COLLECTION /Comments OBJECTTYPE Comment
+CREATE COLLECTION /Likes OBJECTTYPE Like
+CREATE COLLECTION /Favorites OBJECTTYPE Vendors, Comments, Products
 
 #
 # Event Handlers
