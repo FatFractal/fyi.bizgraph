@@ -1,5 +1,6 @@
 <html>
 <head>
+  <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.14.0.css">
   <script type="text/javascript">
     function httpsRedirect() {
       var httpURL = window.location.hostname + window.location.pathname;
@@ -15,6 +16,10 @@
 <body>
   <h1 id="baseurl"></h1>
   <p id="explain"></p>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script src="//code.jquery.com/qunit/qunit-1.14.0.js"></script>
+  <script src="tests.js"></script>
 </body>
 <script type='text/javascript'>
   var baseEl = document.getElementById('baseurl');
