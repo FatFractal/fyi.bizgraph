@@ -15,6 +15,7 @@ SET PushIsInactive              true
 SET ETaggingEnabled             true
 # Remove the following CORS setting if you don't wish to be able to use the data browser from the FatFractal Console
 SET CORS https://system.fatfractal.com
+#SET CORS https://beta.fatfractal.com
 
 #
 # Object Types
@@ -23,20 +24,30 @@ CREATE OBJECTTYPE FFUser (userName STRING, firstName STRING, lastName STRING, em
 CREATE ALIAS ON OBJECTTYPE FFUser GRABBAG BackReferences.FFUserGroup.users AS memberOfGroups
 CREATE OBJECTTYPE FFUserGroup (groupName STRING, users GRABBAG /FFUser)
 CREATE OBJECTTYPE FFNotificationID (idType STRING, idValue STRING)
-CREATE OBJECTTYPE Customer (user REFERENCE /FFUser, address REFERENCE /Addresses, phone STRING, avatar /Avatars)
-CREATE OBJECTTYPE Product (name STRING, description STRING, sku STRING, qrcode BYTEARRAY, mfg REFERENCE /Manufacturers, vendor GRABBAG /Vendors, gallery GRABBAG /ProductImages)
-CREATE OBJECTTYPE OrderLine (order REFERENCE /Orders, product REFERENCE /Products, vendor REFERENCE /Vendors, quantity NUMERIC, price NUMERIC, total NUMERIC)
-CREATE OBJECTTYPE Order (customer REFERENCE /Customers, total NUMERIC, placedAt REFERENCE /Locations)
-CREATE OBJECTTYPE Vendor (name STRING, address REFERENCE /Addresses, providers REFERENCE /FFUserGroup, admins REFERENCE /FFUserGroup)
-CREATE OBJECTTYPE Manufacturer (name STRING, address REFERENCE /Addresses, providers REFERENCE /FFUserGroup, admins REFERENCE /FFUserGroup)
-CREATE OBJECTTYPE Address (street STRING, city STRING, state STRING, postCode STRING, geo GEOLOCATION)
-CREATE OBJECTTYPE Account (customer REFERENCE /Customers, paymentMethod REFERENCE /PaymentMethods)
-CREATE OBJECTTYPE ProductImage (image BYTEARRAY, product REFERENCE /Products)
-CREATE OBJECTTYPE Avatar (image BYTEARRAY)
+DROP OBJECTTYPE Customer
+CREATE OBJECTTYPE Customer (user REFERENCE /FFUser, address REFERENCE /Addresses, phone STRING)
+DROP OBJECTTYPE Product
+CREATE OBJECTTYPE Product (description STRING, sku STRING, qrcode REFERENCE /QRCodes, mfg REFERENCE /Manufacturers, vendors GRABBAG /Vendors)
+DROP OBJECTTYPE Price
+CREATE OBJECTTYPE Price (price NUMERIC, product REFERENCE /Products, vendor REFERENCE /Vendors)
+DROP OBJECTTYPE OrderLine
+CREATE OBJECTTYPE OrderLine (product REFERENCE /Products, quantity NUMERIC, price NUMERIC, total NUMERIC)
+DROP OBJECTTYPE Order
+CREATE OBJECTTYPE Order (customer REFERENCE /Customers, vendor REFERENCE /Vendors, total NUMERIC, orderLines GRABBAG /OrderLines placedAt REFERENCE /Locations)
+CREATE OBJECTTYPE Vendor (name STRING, address REFERENCE /Addresses, logo BYTEARRAY, providers REFERENCE /FFUserGroup, admins REFERENCE /FFUserGroup)
+CREATE OBJECTTYPE Manufacturer (name STRING, address REFERENCE /Addresses, logo BYTEARRAY, providers REFERENCE /FFUserGroup, admins REFERENCE /FFUserGroup)
+DROP OBJECTTYPE Address
+CREATE OBJECTTYPE Address (number STRING, street STRING, city STRING, state STRING, country STRING, postCode STRING, location REFERENCE /Locations)
+DROP OBJECTTYPE Location
 CREATE OBJECTTYPE Location (geo GEOLOCATION)
-CREATE OBJECTTYPE Rating (relatesTo REFERENCE, geo REFERENCE /Locations)
-CREATE OBJECTTYPE Comment (relatesTo REFERENCE, comment STRING, geo REFERENCE /Locations)
-CREATE OBJECTTYPE Like (relatesTo REFERENCE)
+CREATE OBJECTTYPE Account (customer REFERENCE /Customers, paymentMethods GRABBAG /PaymentMethods)
+CREATE OBJECTTYPE PaymentMethod (type STRING, accountNumber STRING, nickname STRING, expireMonth NUMERIC, expireYear NUMERIC, cvv NUMERIC)
+CREATE OBJECTTYPE ProductImage (image BYTEARRAY, product REFERENCE /Products)
+CREATE OBJECTTYPE Avatar (image BYTEARRAY, nickname STRING)
+CREATE OBJECTTYPE Rating (rating STRING, relatesTo REFERENCE, geo REFERENCE /Locations)
+CREATE OBJECTTYPE Comment (comment STRING, relatesTo REFERENCE, geo REFERENCE /Locations)
+CREATE OBJECTTYPE Like (like BOOLEAN, relatesTo REFERENCE, geo REFERENCE /Locations)
+CREATE OBJECTTYPE QRCode (image BYTEARRAY)
 #
 # Collection Resources
 #
@@ -45,23 +56,33 @@ CREATE COLLECTION /FFUserGroup OBJECTTYPE FFUserGroup
 CREATE COLLECTION /FFNotificationID OBJECTTYPE FFNotificationID
 CREATE COLLECTION /Customers OBJECTTYPE Customer
 CREATE COLLECTION /Products OBJECTTYPE Product
+CREATE COLLECTION /Prices OBJECTTYPE Price
+CREATE VIRTUAL_COLLECTION /Locations as javascript:require('scripts/Location')
 CREATE COLLECTION /OrderLines OBJECTTYPE OrderLine
 CREATE COLLECTION /Orders OBJECTTYPE Order
 CREATE COLLECTION /Vendors OBJECTTYPE Vendor
 CREATE COLLECTION /Manufacturers OBJECTTYPE Manufacturer
 CREATE COLLECTION /Addresses OBJECTTYPE Address
 CREATE COLLECTION /Accounts OBJECTTYPE Account
+CREATE COLLECTION /PaymentMethods OBJECTTYPE PaymentMethod
 CREATE COLLECTION /ProductImages OBJECTTYPE ProductImage
-CREATE COLLECTION /Avatars OBJECTTYPE Avatar
 CREATE COLLECTION /Ratings OBJECTTYPE Rating
 CREATE COLLECTION /Comments OBJECTTYPE Comment
 CREATE COLLECTION /Likes OBJECTTYPE Like
-CREATE COLLECTION /Favorites OBJECTTYPE Vendors, Comments, Products
+CREATE COLLECTION /Favorites OBJECTTYPE Vendor, Comment, Product
+CREATE COLLECTION /QRCodes OBJECTTYPE QRCode
 
 #
 # Event Handlers
 #
+CREATE HANDLER locations POST ON /Addresses CREATE AS javascript:require('scripts/handlers').addLocation();
+CREATE HANDLER qrCode POST ON /Products CREATE AS javascript:require('scripts/handlers').addQRCode();
+CREATE HANDLER increase POST ON /Orders GRABBAG_ADD AS javascript:require('scripts/handlers').totalOrder();
+CREATE HANDLER decrease POST ON /Orders GRABBAG_REMOVE AS javascript:require('scripts/handlers').totalOrder();
 
 #
 # Extension Resources
 #
+CREATE EXTENSION /populate UNSECURED AS javascript:require('scripts/extensions').populate();
+CREATE EXTENSION /cleanup UNSECURED AS javascript:require('scripts/extensions').cleanup();
+CREATE EXTENSION /createSomeOrders UNSECURED AS javascript:require('scripts/extensions').createSomeOrders();
