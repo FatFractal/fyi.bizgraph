@@ -10,6 +10,45 @@ exports.addLocation = function() {
     if(common.debug) print("handlers.js.addAddressLocation added 'location' reference to Address " + JSON.stringify(address));    
 }
 
+exports.addToAdminGroup = function() {
+    var newUser = ff.getEventHandlerData();
+    if (common.isOnTheList(newUser.email)) {
+        var sysAdminGroup = common.getSysAdminGroup();
+        sysAdminGroup.addUser(newUser);
+        if(common.debug) print ("handlers.js.addToAdminGroup Added " + newUser.email + " to sysAdminGroup");
+    }
+}
+
+exports.grantAccessToVendor = function() {
+    var order = ff.getEventHandlerData();
+    if(common.debug) print ("handlers.js.grantAccessToVendor received order " + JSON.stringify(order));
+    var customer = ff.getReferredObject("customer", order);
+    if(common.debug) print ("handlers.js.grantAccessToVendor received customer " + JSON.stringify(customer));
+    var user = ff.getReferredObject("user", customer);
+    if(common.debug) print ("handlers.js.grantAccessToVendor received user " + JSON.stringify(user));
+    var vendor = ff.getReferredObject("vendor", order);
+    if(common.debug) print ("handlers.js.grantAccessToVendor received vendor " + JSON.stringify(vendor));
+    var adminGroup = ff.getReferredObject("admins", vendor);
+    if(common.debug) print ("handlers.js.grantAccessToVendor received adminGroup " + JSON.stringify(adminGroup));
+    var vendorAdmins = ff.getArrayFromUri(adminGroup.ffUrl + "/users");
+    if(common.debug) print ("handlers.js.grantAccessToVendor received vendorAdmins " + JSON.stringify(vendorAdmins));
+    var vendorShare = ff.getReferredObject("vendorAccess", customer);
+    if(common.debug) print ("handlers.js.grantAccessToVendor received vendorShare " + JSON.stringify(vendorShare));
+    if(!vendorShare) {
+        if(common.debug) print ("handlers.js.grantAccessToVendor missing vendorShare, creating new group");
+        vendorShare = new ff.FFUserGroup(ff.createObjAtUri({createdBy:user.guid, groupName:'vendorAccess',clazz:'FFUserGroup'}, '/FFUserGroup'));
+        if(common.debug) print ("handlers.js.grantAccessToVendor created vendorShare " + JSON.stringify(vendorShare));
+        ff.addReferenceToObj(vendorShare.ffUrl, "vendorAccess", customer);
+        ff.updateObj(customer, user.guid);
+    } else {
+        vendorShare = new ff.FFUserGroup(vendorShare);        
+    }
+    for (var i = 0; i < vendorAdmins.length; i++) {
+        if(common.debug) print ("handlers.js.grantAccessToVendor adding vendorAdmin to vendorAccess group " + JSON.stringify(vendorAdmins[i]));
+        vendorShare.addUser(vendorAdmins[i]);
+    }    
+}
+
 exports.addQRCode = function() {
     var product = ff.getEventHandlerData();
     var qrimg = common.makeQRCode(product.sku);

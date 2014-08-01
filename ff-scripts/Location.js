@@ -5,8 +5,13 @@ var common = require('scripts/common');
 exports.retrieve = function(paramObject) {
     if(common.debug) print("Location.js.retrieve received paramObject " + paramObject);
     var requestUri = paramObject["requestUri"];
+    if(common.debug) print("Location.js.retrieve requestUri is " + requestUri);
     var query = paramObject["query"];
+    if(common.debug) print("Location.js.retrieve query is " + query);
     var guid = paramObject["guid"];
+    if(common.debug) print("Location.js.retrieve guid is " + guid);
+    var user = ff.getActiveUser();
+    if(common.debug) print("Location.js.retrieve user is " + user);
 
     var allObjs = [];
     try {
@@ -20,7 +25,7 @@ exports.retrieve = function(paramObject) {
         } else {
             url = "/Addresses";
         }
-        var allAddresses = ff.getArrayFromUri(url);
+        var allAddresses = ff.getArrayFromUri(url, user.guid);
         if (allAddresses && allAddresses.length > 0) {
             if(common.debug) print("Location.js.retrieve retrieved " + allAddresses.length + " Addresses");
             for (var i = 0; i < allAddresses.length; i++) {
@@ -31,6 +36,7 @@ exports.retrieve = function(paramObject) {
                         guid:allAddresses[i].guid + "GEO",
                         geo:geo,
                         createdBy:"system",
+                        updatedBy:"system",
                         ffUrl:"/ff/resources/Locations/" +  allAddresses[i].guid + "GEO",
                         ffRL:"/Locations",
                         clazz:"Location"

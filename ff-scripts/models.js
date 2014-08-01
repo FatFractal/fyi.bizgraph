@@ -129,15 +129,51 @@ function QRCode () {
 }
 exports.QRCode = QRCode;
 
+exports.setUpSysAdmins = function() {
+    var count = 0;
+    var email = "adam@bizgraph.com";
+    var usr = ff.getObjFromUri("/FFUser/(email eq '" + email + "')");
+    if(!usr) {
+        // register the user
+        var reg = {userName:email,firstName:"Adam",lastName:"Bizgraph",email:email};
+        if(common.debug) print("models.js.setUpSysAdmins user does not exist, registering:  " + JSON.stringify(reg));
+        usr = ff.registerUser(reg, "Iwantin123", true, false);
+        count ++;
+    }
+    var sysAdminGroup = common.getSysAdminGroup();
+    var admins = ff.getArrayFromUri(sysAdminGroup.ffUrl + "/users");
+    var addThis = true;
+    if(admins.length > 0) {
+        for (var j = 0; j < admins.length; j++) {
+            var guid = admins[j].guid;
+            if(guid == usr.guid) addThis = false;
+        }
+    }
+    if(addThis) {
+        sysAdminGroup.addUser(usr);
+        print ("Added " + usr.email + " to sysAdminGroup");
+    }
+    return count;  
+}
+
 exports.createSomeMfgs = function() {
     var objs = [
-    {name:"Zojurushi",number:"1149",street:"W 190th St #1000",city:"Gardena",state:"CA",postCode:"90248",country:"USA",logoUrl:"http://www.zojirushi.com/img/zojirushi_logo_black.jpg",logoType:"image/jpg"},
-    {name:"Epson",number:"3840",street:"Kilroy Airport Way",city:"Long Beach",state:"CA",postCode:"90806",country:"USA",logoUrl:"http://www.epson.com/_assets/img/header/header-logo-tagline.png",logoType:"image/jpg"},
-    {name:"Shark",number:"180",street:"Wells Avenue #200",city:"Newton",state:"MA",postCode:"02459",country:"USA",logoUrl:"http://www.sharkclean.com/include/images/layout/footer_joinUs.jpg",logoType:"image/jpg"},
-    {name:"Stoneline",number:"16",street:"Carroll Street",city:"Dunedin",state:"",postCode:"9016",country:"NZ",logoUrl:"http://www.stoneline.co.nz/images/551/medium/logo.jpg",logoType:"image/jpg"}
+    {adminEmail:"adam@zojurushi.com",name:"Zojurushi",number:"1149",street:"W 190th St #1000",city:"Gardena",state:"CA",postCode:"90248",country:"USA",logoUrl:"http://www.zojirushi.com/img/zojirushi_logo_black.jpg",logoType:"image/jpg"},
+    {adminEmail:"adam@epson.com",name:"Epson",number:"3840",street:"Kilroy Airport Way",city:"Long Beach",state:"CA",postCode:"90806",country:"USA",logoUrl:"http://www.epson.com/_assets/img/header/header-logo-tagline.png",logoType:"image/jpg"},
+    {adminEmail:"adam@shark.com",name:"Shark",number:"180",street:"Wells Avenue #200",city:"Newton",state:"MA",postCode:"02459",country:"USA",logoUrl:"http://www.sharkclean.com/include/images/layout/footer_joinUs.jpg",logoType:"image/jpg"},
+    {adminEmail:"adam@stoneline.com",name:"Stoneline",number:"16",street:"Carroll Street",city:"Dunedin",state:"",postCode:"9016",country:"NZ",logoUrl:"http://www.stoneline.co.nz/images/551/medium/logo.jpg",logoType:"image/jpg"}
     ];
     var count = 0;
     for (var i = 0; i < objs.length; i++) {
+        var usr = ff.getObjFromUri("/FFUser/(email eq '" + objs[i].adminEmail + "')");
+        if(common.debug) print("models.js.createSomeMfgs test user is:  " + JSON.stringify(usr));
+        if(!usr) {
+            // register the user
+            var reg = {userName:objs[i].adminEmail,firstName:"Adam",lastName:objs[i].name,email:objs[i].adminEmail};
+            if(common.debug) print("models.js.createSomeMfgs user does not exist, registering:  " + JSON.stringify(reg));
+            usr = ff.registerUser(reg, "Iwantin123", true, false);
+            count ++;
+        }
         var test = ff.getObjFromUri("/Manufacturers/" + objs[i].name);
         if(!test) {
             var ad = new Address();
@@ -147,14 +183,18 @@ exports.createSomeMfgs = function() {
             ad.state = objs[i].state;
             ad.postCode = objs[i].postCode;
             ad.country = objs[i].country;
-            ad = ff.createObjAtUri(ad, "/Addresses", "system");
+            ad = ff.createObjAtUri(ad, "/Addresses", usr.guid);
             count ++;
             if(common.debug) print("models.js.createSomeMfgs created Address " + ad);
+            // add admins
+            var adminGroup = new ff.FFUserGroup(ff.createObjAtUri({groupName:'admins',createdBy:usr.guid,clazz:'FFUserGroup'}, "/FFUserGroup"));
+            adminGroup.addUser(usr)
             var obj = new Manufacturer();
             obj.name = objs[i].name;
             obj.guid = objs[i].name;
             ff.addReferenceToObj(ad.ffUrl, "address", obj);
-            obj = ff.createObjAtUri(obj, "/Manufacturers", "system");
+            ff.addReferenceToObj(adminGroup.ffUrl, "admins", obj);
+            obj = ff.createObjAtUri(obj, "/Manufacturers", usr.guid);
             count ++;
             var img = common.getThumb(objs[i].logoUrl, objs[i].logoType);
             if(common.debug) print("models.js.createSomeMfgs created Manufacturer " + obj.guid);
@@ -166,12 +206,21 @@ exports.createSomeMfgs = function() {
 
 exports.createSomeVendors = function() {
     var objs = [
-    {name:"Amazon",number:"1200",street:"12th Ave. South, Ste. 1200",city:"Seattle",state:"WA",postCode:"98144-2734",country:"USA",logoUrl:"http://phandroid.s3.amazonaws.com/wp-content/uploads/2010/09/amazon-logo-1.jpg",logoType:"image/jpg"},
+    {adminEmail:"adam@amazon.com",name:"Amazon",number:"1200",street:"12th Ave. South, Ste. 1200",city:"Seattle",state:"WA",postCode:"98144-2734",country:"USA",logoUrl:"http://phandroid.s3.amazonaws.com/wp-content/uploads/2010/09/amazon-logo-1.jpg",logoType:"image/jpg"},
     // {name:"IBM",number:"1",street:"New Orchard Road",city:"Armonk",state:"NY",postCode:"10504-1722",country:"USA",logoUrl:"http://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/1000px-IBM_logo.svg.png",logoType:"image/png"},
-    {name:"BestBuy",number:"7601",street:"Penn Avenue South",city:"Richfield",state:"MN",postCode:"55423",country:"USA",logoUrl:"http://img.bbystatic.com/BestBuy_US//en_US/images/global/header/logo.png",logoType:"image/png"}
+    {adminEmail:"adam@bestbuy.com",name:"BestBuy",number:"7601",street:"Penn Avenue South",city:"Richfield",state:"MN",postCode:"55423",country:"USA",logoUrl:"http://img.bbystatic.com/BestBuy_US//en_US/images/global/header/logo.png",logoType:"image/png"}
     ];
     var count = 0;
     for (var i = 0; i < objs.length; i++) {
+        var usr = ff.getObjFromUri("/FFUser/(email eq '" + objs[i].adminEmail + "')");
+        if(common.debug) print("models.js.createSomeVendors test user is:  " + JSON.stringify(usr));
+        if(!usr) {
+            // register the user
+            var reg = {userName:objs[i].adminEmail,firstName:"Adam",lastName:objs[i].name,email:objs[i].adminEmail};
+            if(common.debug) print("models.js.createSomeVendors user does not exist, registering:  " + JSON.stringify(reg));
+            usr = ff.registerUser(reg, "Iwantin123", true, false);
+            count ++;
+        }
         var test = ff.getObjFromUri("/Manufacturers/" + objs[i].name);
         if(!test) {
             var ad = new Address();
@@ -181,19 +230,23 @@ exports.createSomeVendors = function() {
             ad.state = objs[i].state;
             ad.postCode = objs[i].postCode;
             ad.country = objs[i].country;
-            ad = ff.createObjAtUri(ad, "/Addresses", "system");
+            ad = ff.createObjAtUri(ad, "/Addresses", usr.guid);
             count ++;
             if(common.debug) print("models.js.createSomeVendors created Address " + ad);
+            // add admins
+            var adminGroup = new ff.FFUserGroup(ff.createObjAtUri({groupName:'admins',createdBy:usr.guid,clazz:'FFUserGroup'}, "/FFUserGroup"));
+            adminGroup.addUser(usr)
             var obj = new Vendor();
             obj.name = objs[i].name;
             obj.guid = objs[i].name;
             ff.addReferenceToObj(ad.ffUrl, "address", obj);
-            obj = ff.createObjAtUri(obj, "/Vendors", "system");
+            ff.addReferenceToObj(adminGroup.ffUrl, "admins", obj);
+            obj = ff.createObjAtUri(obj, "/Vendors", usr.guid);
             count ++;
             var img = common.getThumb(objs[i].logoUrl, objs[i].logoType);
             if(common.debug) print("models.js.createSomeVendors created Vendor " + obj.guid);
             ff.saveBlob(obj, 'logo', img, objs[i].logoType);        
-        }
+        }        
     }
     return count;  
 }
@@ -215,13 +268,18 @@ exports.createSomePrices = function() {
  // if(!test) {
         var vendor = ff.getObjFromUri("/Vendors/"+objs[i].vendor);
         if(vendor) {
+            //get the admin for the vendor
+            var adminGroup = ff.getReferredObject("admins", vendor);
+            var admins = ff.getArrayFromUri(adminGroup.ffUrl + "/users");
+            if(common.debug) print("models.js.createSomePrices Manufacturer admins "+JSON.stringify(admins));
+            var admin = admins[0];
             var prod = ff.getObjFromUri("/Products/"+objs[i].sku);
             if(prod) {
                 var p = new Price();
                 p.price = objs[i].price;
                 ff.addReferenceToObj(vendor.ffUrl, "vendor", p);
                 ff.addReferenceToObj(prod.ffUrl, "product", p);
-                p = ff.createObjAtUri(p, "/Prices", "system");
+                p = ff.createObjAtUri(p, "/Prices", admin.guid);
                 if(common.debug) print("models.js.createSomePrices created Price " + p.guid);                
                 count ++;                            
             } else if(common.debug) print("models.js.createSomePrices Product not found " + prod.guid);            
@@ -244,9 +302,15 @@ exports.createSomeProducts = function() {
     ];
     var count = 0;
     for (var i = 0; i < objs.length; i++) {
-        var test = ff.getObjFromUri("/Products/" + objs[i].sku);
-        if(!test) {
+        var prod = ff.getObjFromUri("/Products/" + objs[i].sku);
+        if(!prod) {
+            //get the admin for the mfg
             var mfg = ff.getObjFromUri("/Manufacturers/"+ objs[i].mfg);
+            var adminGroup = new ff.FFUserGroup(ff.getReferredObject("admins", mfg));
+            if(common.debug) print("models.js.createSomeProducts Manufacturer adminGroup "+JSON.stringify(adminGroup));
+            var admins = ff.getArrayFromUri(adminGroup.ffUrl + "/users");
+            if(common.debug) print("models.js.createSomeProducts Manufacturer admins "+JSON.stringify(admins));
+            var admin = admins[0];
             if(mfg) {
                 var obj = new Product();
                 obj.guid = objs[i].sku;
@@ -255,18 +319,18 @@ exports.createSomeProducts = function() {
                 obj.model = objs[i].model;
                 obj.weight = objs[i].weight;                
                 ff.addReferenceToObj(mfg.ffUrl, "mfg", obj);
-                obj = ff.createObjAtUri(obj, "/Products", "system");
+                obj = ff.createObjAtUri(obj, "/Products", admin.guid);
                 count ++;
                 if(common.debug) print("models.js.createSomeProducts created Product " + obj.guid);                
                 var img = common.getThumb(objs[i].picture, objs[i].type);
                 var pimg = new ProductImage();
                 ff.addReferenceToObj(obj.ffUrl, "product", pimg);
-                pimg = ff.createObjAtUri(pimg, "/ProductImages", "system");
+                pimg = ff.createObjAtUri(pimg, "/ProductImages", admin.guid);
                 count ++;
                 ff.saveBlob(pimg, 'image', img, objs[i].type);
                       
             } else {
-                if(common.debug) print("models.js.createSomeProducts could not find Manufacturer " + mfg + ", skipping add product")
+                if(common.debug) print("models.js.createSomeProducts could not find Manufacturer " + mfg + ", skipping add product");
             }
         }
     }
@@ -300,6 +364,9 @@ exports.createSomeCustomers = function() {
         if(!test) {
             var cus = new Customer();
             cus.phone = objs[i].phone;
+            cus.firstName = objs[i].firstName;
+            cus.lastName = objs[i].lastName;
+            cus.email = objs[i].email;
             // create the address
             var ad = new Address();
             ad.number = objs[i].number;
@@ -308,12 +375,12 @@ exports.createSomeCustomers = function() {
             ad.state = objs[i].state;
             ad.postCode = objs[i].postCode;
             ad.country = objs[i].country;
-            ad = ff.createObjAtUri(ad, "/Addresses", "system");
+            ad = ff.createObjAtUri(ad, "/Addresses", usr.guid);
             count ++;
             // now, add references and save customer
             ff.addReferenceToObj(ad.ffUrl, "address", cus);            
             ff.addReferenceToObj(usr.ffUrl, "user", cus);
-            cus = ff.createObjAtUri(cus, "/Customers", "system");            
+            cus = ff.createObjAtUri(cus, "/Customers", usr.guid);            
             if(common.debug) print("models.js.createSomeCustomers created Customer " + cus);
             count ++;
         }        
@@ -326,10 +393,18 @@ exports.createSomeAddresses = function() {
     {number:"376",street:"University Ave",city:"Palo Alto",state:"CA",postCode:"94301",country:"USA"},
     {number:"714",street:"7th Ave",city:"New York",state:"NY",postCode:"10036",country:"USA"},
     {number:"4550",street:"Worth St",city:"Dallas",state:"TX",postCode:"75246",country:"USA"},
+    {number:"530",street:"E McDowell Rd",city:"Phoenix",state:"AZ",postCode:"85003",country:"USA"},
+    {number:"1",street:"W Rivercenter Blvd",city:"Covington",state:"KY",postCode:"41011",country:"USA"},
+    {number:"127",street:"Ranch Dr",city:"Milpitas",state:"CA",postCode:"95035",country:"USA"},
+    {number:"401",street:"Biscayne Blvd #8323",city:"Miami",state:"FL",postCode:"33132",country:"USA"},
+    {number:"4",street:"Limmatquai",city:"Zürich",state:"",postCode:"",country:"Zürich"},
     {number:"801",street:"Alaskan Way",city:"Seattle",state:"WA",postCode:"98104",country:"USA"}
     ];
     var count = 0;
     for (var i = 0; i < objs.length; i++) {
+        // get a random user for the address
+        var customer = ff.getObjFromUri("/Customers/(guid eq random(guid))");
+        var user = ff.getReferredObject("user", customer);
         // create the address
         var ad = new Address();
         ad.number = objs[i].number;
@@ -338,7 +413,7 @@ exports.createSomeAddresses = function() {
         ad.state = objs[i].state;
         ad.postCode = objs[i].postCode;
         ad.country = objs[i].country;
-        ad = ff.createObjAtUri(ad, "/Addresses", "system");
+        ad = ff.createObjAtUri(ad, "/Addresses", user.guid);
         count ++;
     }    
     return count;  
@@ -346,45 +421,53 @@ exports.createSomeAddresses = function() {
 
 exports.createSomeOrders = function() {
     var count = 0;
-    var customer = ff.getObjFromUri("/Customers/(guid eq random(guid))");
-    var user = ff.getReferredObject("user", customer);
-    if(common.debug) print("models.js.createSomeOrders retrieved Customer " + JSON.stringify(customer));
-    var address = ff.getObjFromUri("/Addresses/(guid eq random(guid))");
-    if(common.debug) print("models.js.createSomeOrders retrieved Address " + JSON.stringify(address));
-    var numOrders = Math.floor(Math.random() * 10) + 1;
-    if(common.debug) print("models.js.createSomeOrders will create "+numOrders+" Orders");
-    for (var i = 0; i < numOrders; i++) {
-        // get a random Vendor
-        var vendor = ff.getObjFromUri("/Vendors/(guid eq random(guid))");
-        if(common.debug) print("models.js.createSomeOrders retrieved Vendor " + JSON.stringify(vendor));
-        var order = new Order();
-        ff.addReferenceToObj(customer.ffUrl, "customer", order);            
-        ff.addReferenceToObj(vendor.ffUrl, "vendor", order);            
-        ff.addReferenceToObj("/ff/resources/Locations/"+address.guid+"GEO", "placedAt", order);            
-        order = ff.createObjAtUri(order, "/Orders", user.guid);
-        count ++;               
-        if(common.debug) print("models.js.createSomeOrders created Order " + JSON.stringify(order));
-        var numProds = Math.floor(Math.random() * 10) + 1;
-        if(common.debug) print("models.js.createSomeOrders will create "+numProds+" OrderLines");
-        for (var j = 0; j < numProds; j++) {
-            var qty = Math.floor(Math.random() * 10) + 1;
-            if(common.debug) print("models.js.createSomeOrders will set quantity to "+qty);
-            // get a random price
-            if(common.debug) print("models.js.createSomeOrders "+vendor.ffUrl + "/BackReferences.Prices/(guid eq random(guid))");
-            var price = ff.getObjFromUri(vendor.ffUrl + "/BackReferences.Prices/(guid eq random(guid))");
-            if(common.debug) print("models.js.createSomeOrders retrieved Price " + JSON.stringify(price));
-            // get the product
-            var prod = ff.getReferredObject("product", price); 
-            var line = new OrderLine();
-            line.price = price.price;
-            line.quantity = qty;
-            line.total = qty * price.price;
-            ff.addReferenceToObj(prod.ffUrl, "product", line);            
-            ff.addReferenceToObj(vendor.ffUrl, "vendor", line);    
-            line = ff.createObjAtUri(line, "/OrderLines", user.guid);
-            if(common.debug) print("models.js.createSomeOrders created OrderLine " + JSON.stringify(line));
-            ff.grabBagAdd(line.ffUrl, order.ffUrl, "orderLines", user.guid);
+    var customers = ff.getArrayFromUri("/Customers");
+    if(common.debug) print("models.js.createSomeOrders retrieved " + customers.length + " Customer objects");
+    for (var c = 0; c < customers.length; c++) {
+        var customer = customers[c];
+        var user = ff.getReferredObject("user", customer);
+        if(common.debug) print("models.js.createSomeOrders retrieved Customer " + JSON.stringify(customer));
+        var address = ff.getObjFromUri("/Addresses/(guid eq random(guid))");
+        if(!address) {
+            var ad = {clazz:"Address",number:"123",street:"Main Street",city:"Anytown",state:"OH",postCode:"23456",country:"USA"};
+            address = ff.createObjAtUri(ad, "/Addresses", user.guid);
+        }
+        if(common.debug) print("models.js.createSomeOrders retrieved Address " + JSON.stringify(address));
+        var numOrders = Math.floor(Math.random() * 10) + 1;
+        if(common.debug) print("models.js.createSomeOrders will create "+numOrders+" Orders");
+        for (var i = 0; i < numOrders; i++) {
+            // get a random Vendor
+            var vendor = ff.getObjFromUri("/Vendors/(guid eq random(guid))");
+            if(common.debug) print("models.js.createSomeOrders retrieved Vendor " + JSON.stringify(vendor));
+            var order = new Order();
+            ff.addReferenceToObj(customer.ffUrl, "customer", order);
+            ff.addReferenceToObj(vendor.ffUrl, "vendor", order);            
+            ff.addReferenceToObj(address.ffUrl, "placedAt", order);            
+            order = ff.createObjAtUri(order, "/Orders", user.guid);
             count ++;               
+            if(common.debug) print("models.js.createSomeOrders created Order " + JSON.stringify(order));
+            var numOrderLines = Math.floor(Math.random() * 10) + 1;
+            if(common.debug) print("models.js.createSomeOrders will create "+numOrderLines+" OrderLines");
+            for (var j = 0; j < numOrderLines; j++) {
+                var qty = Math.floor(Math.random() * 10) + 1;
+                if(common.debug) print("models.js.createSomeOrders will set quantity to "+qty);
+                // get a random price
+                if(common.debug) print("models.js.createSomeOrders "+vendor.ffUrl + "/BackReferences.Prices/(guid eq random(guid))");
+                var price = ff.getObjFromUri(vendor.ffUrl + "/BackReferences.Prices/(guid eq random(guid))");
+                if(common.debug) print("models.js.createSomeOrders retrieved Price " + JSON.stringify(price));
+                // get the product
+                var prod = ff.getReferredObject("product", price); 
+                var line = new OrderLine();
+                line.price = price.price;
+                line.quantity = qty;
+                line.total = qty * price.price;
+                ff.addReferenceToObj(prod.ffUrl, "product", line);            
+                ff.addReferenceToObj(order.ffUrl, "order", line);
+                line = ff.createObjAtUri(line, "/OrderLines", user.guid);
+                if(common.debug) print("models.js.createSomeOrders created OrderLine " + JSON.stringify(line));
+                // ff.grabBagAdd(line.ffUrl, order.ffUrl, "orderLines", user.guid);
+                count ++;               
+            }
         }
     }
     return count;  
