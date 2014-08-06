@@ -9,8 +9,6 @@
         var httpsURL = "https://" + httpURL;
         window.location = httpsURL;
     }
-    console.log(window.location.href);
-    console.log(!window.location.href.match('^https://') && !window.location.href.match('^http://localhost'));
     if (!window.location.href.match('^https://') && !window.location.href.match('^http://localhost'))
     httpsRedirect();
     </script>
@@ -132,10 +130,10 @@
         <div class="well" id = "orders-permissions-section">
             <h2>Orders with Permissions</h2>
             <p>This example shows how declarative permissions can be used to control access to data using permissions.</p>
-            <button id="orders-permissions-customer-button" class="btn" onclick="getAllOrdersWithPermissions('nickelskevin@gmail.com','Iwantin123')">Customer</button>
-            <button id="orders-permissions-vendor-button" class="btn" onclick="getAllOrdersWithPermissions('adam@bestbuy.com','Iwantin123')">Vendor</button>
-            <button id="orders-permissions-mfg-button" class="btn" onclick="getAllOrdersWithPermissions('adam@zojurushi.com','Iwantin123')">Manufacturer</button>         
-            <button id="orders-permissions-admin-button" class="btn" onclick="getAllOrdersWithPermissions('adam@bizgraph.com','Iwantin123')">System Administrator</button><br><br>
+            <button id="orders-permissions-customer-button" class="btn" onclick="getAllOrdersWithPermissions('nickelskevin@gmail.com','asdf')">Customer</button>
+            <button id="orders-permissions-vendor-button" class="btn" onclick="getAllOrdersWithPermissions('adam@bestbuy.com','asdf')">Vendor</button>
+            <button id="orders-permissions-mfg-button" class="btn" onclick="getAllOrdersWithPermissions('adam@zojurushi.com','asdf')">Manufacturer</button>         
+            <button id="orders-permissions-admin-button" class="btn" onclick="getAllOrdersWithPermissions('adam@bizgraph.com','asdf')">System Administrator</button><br><br>
             <ul class="nav nav-tabs" role="tablist" id = "orders-permissions-tabs">
                 <li class="active"><a href="#orders-permissions-request" role="tab" data-toggle="tab">Request</a></li>
                 <li><a href="#orders-permissions-models" role="tab" data-toggle="tab">Models</a></li>
@@ -257,82 +255,11 @@
             <br>
             <p id = "query-response"></p>
         </div>
-        <div class="well" id = "datagraph-section">
-            <h2>Datagraph</h2>
-            <p>This test will fetch the entire datagraph.
-                <div class="well">
-                    <p>var datagraph;<br>
-                        ff.getArrayFromUri("/Customers/()?depthRef=3&depthGb=3", function(response) {<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;datagraph = response;<br>
-                        });
-                    </p>
-                </div>
-                <button id="get-datagraph-button" class="btn" onclick="getCustomerGraph()">Try it!</button>
-                <br>
-                <p id = "get-datagraph-response"></p>
-            </div>
-            <h3>The following Model is used with this post</h3>
-            <div class="well">
-                <p>function Customer(obj) {<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;this.user = new FFUser();<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;this.firstName = obj.firstName;<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;this.lastName = obj.firstName;<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;this.email = obj.email;<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;this.phone = obj.phone;<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;this.address = new Address();<br>
-                }</p>
-                <p>function Address(obj) {<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;this.street = obj.street<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;this.city = obj.city;<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;this.state = obj.state;<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;this.country = obj.country;<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;this.postCode = obj.postCode;<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;this.location = new Location();<br>
-                }</p>
-                <p>function Location(obj) {<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;this.geo = obj.geo<br>
-                }</p>
-            </div>
-        </div>
     </div>
 </body>
 <!--Scripts-->
 <script type="text/javascript">
 // View elements
-function OrderLineT(orderLines) {
-    var wrap = document.createElement("div");
-    wrap.className = "well";
-    var ordersT = document.createElement("t");
-    var ordersTHR = document.createElement("tr");
-    wrap.appendChild(ordersT);
-    wrap.appendChild(ordersTHR);
-    ordersTHR.innerHTML = "<th>Item</th><th>Quantity</th><th>Description</th><th>Price</th><th>Total</th>";
-    for(var i = 0; i < orderLines.length; i++) {
-        var ol = new OrderLine(orderLines[i]);
-        var mediaDiv = document.createElement("div");
-        mediaDiv.className = "media";
-        var imgA = document.createElement("a");
-        imgA.className = "pull-left";
-        imgA.style.clear = 'both'
-        var img = document.createElement("img");
-        img.className = "media-object";
-        img.src = "/bizgraph"+ol.product.mfg.logo;
-        var mediaHeading = document.createElement("p");
-        mediaHeading.innerHTML = ol.product.mfg.name;
-        mediaHeading.className = "media-heading";		     
-        ff.getObjFromUri(ol.metadata.ffUrl+"/BackReferences.ProductImages.image", function(pi) {
-            var p = new ProductImage(pi);
-            var itemTR = document.createElement("tr");
-            itemTR.innerHTML = "<td><img src="+p.image+"</td><td>"+ol.quantity+"</td><td>"+ol.description+"</td><td>"+ol.price+"</td><td>"+ol.total+"</td>";
-            ordersT.appendChild(itemTR);
-        }, function(code, msg) {
-            ordersWrap.innerHTML = "<br><div class = 'well red'>OrderElement.getObjFromUri() error: " + msg + "</div>";
-            console.error("OrderElement.getObjFromUri() Error: " + code + " " + msg);
-        });
-    }
-    return wrap;    
-}
-
 function OrderElement(order) {
     var ordersWrap = document.createElement("div");
     ordersWrap.className = "well";
@@ -345,19 +272,52 @@ function OrderElement(order) {
     img.className = "media-object";
     img.src = "/bizgraph"+order.vendor.logo;
     var mediaHeading = document.createElement("p");
+    var mediaBody = document.createElement("div");
+    var ordersT = document.createElement("t");
+    var ordersTHR = document.createElement("tr");
+    var orderSummary = document.createElement("p");
+    mediaHeading.className = "media-heading";		 
     var v = order.vendor.name;
     var d = new Date(order.metadata.createdAt);
     mediaHeading.innerHTML = "Placed with <strong>"+v+"</strong> on "+d;
-    mediaHeading.className = "media-heading";		 
-    var mediaBody = document.createElement("div");
+    var ordersStr= "<th style=text-align:center>Item</th>"+
+    "<th style=text-align:center>Quantity</th>"+
+    "<th>Description</th>"+
+    "<th style=text-align:center>Price</th>"+
+    "<th style=text-align:center>Total</th>"
+    ordersTHR.innerHTML = ordersStr;
+    ordersWrap.appendChild(mediaDiv);
+    mediaDiv.appendChild(imgA);
+    imgA.appendChild(img);
+    ordersWrap.appendChild(mediaHeading);
+    ordersWrap.appendChild(ordersT);
+    ordersT.appendChild(ordersTHR);
+    ordersWrap.appendChild(orderSummary);
+    orderSummary.innerHTML = "<br>Order total: "+order.total;
     ff.getArrayFromUri(order.metadata.ffUrl+"/BackReferences.OrderLines", function(ols) {
         if(!ols || ols.length <= 0) {
             ordersWrap.innerHTML = "You do not have permission to see any OrderLine objects from the /OrderLines collection."
         } else {
             console.log("OrderElement.getArrayFromUri() retrieved: " + ols.length + " OrderLines");
-            console.log("OrderElement.getArrayFromUri() retrieved: " + JSON.stringify(ols));
-            var olT = new OrderLineT(ols);
-            mediaBody.innerHTML += "<br>Order total: "+order.total;
+            for(var i = 0; i < ols.length; i++) {
+                var ol = new OrderLine(ols[i]);
+                var url = ol.product.metadata.ffUrl+"/BackReferences.ProductImages.product";
+                var itemTR = document.createElement("tr");
+                // var str = "<td width=150px; height=150px; align=center valign=middle><img src=/bizgraph"+p.image+"></img></td>"+
+                var str = "<td width=150px; height=150px; align=center valign=middle></td>"+
+                "<td width=70px; style=text-align:center>"+ol.quantity+"</td>"+
+                "<td width=300px;>"+ol.product.description+"</td>"+
+                "<td width=70px; style=text-align:center>$"+ol.price+"</td>"+
+                "<td width=70px; style=text-align:center>$"+ol.total+"</td>"
+                itemTR.innerHTML = str;
+                ordersT.appendChild(itemTR);
+                ff.getObjFromUri(url, function(pi) {
+                    var p = new ProductImage(pi);
+                }, function(code, msg) {
+                    ordersWrap.innerHTML = "<br><div class = 'well red'>OrderElement.getObjFromUri() error: " + msg + "</div>";
+                    console.error("OrderElement.getObjFromUri() Error: " + code + " " + msg);
+                });
+            }
         }
     }, function(code, msg) {
         ordersWrap.innerHTML = "<br><div class = 'well red'>OrderElement.getObjFromUri() error: " + msg + "</div>";
@@ -369,7 +329,7 @@ function OrderElement(order) {
 function getRandomCustomerGraph() {
     var el = document.getElementById('customer-graph-response');
     el.innerHTML = "";
-    ff.login("adam@bizgraph.com", "Iwantin123", function() {
+    ff.login("adam@bizgraph.com", "asdf", function() {
         ff.getObjFromUri("/Customers/(guid eq random(guid))", function(obj) {
             var str = "";
             var elStr = "";
@@ -432,7 +392,6 @@ function getAllOrdersWithPermissions(u, p) {
                     ordersP.innerHTML = order.customer.address.number+" "+order.customer.address.street+"<br>"+
                     order.customer.address.city+", "+order.customer.address.state+", "+order.customer.address.postCode+", "+order.customer.address.country;
                     var orderMeta = new FFMetaData(arr[i]);
-                    console.log(JSON.stringify(orderMeta));
                     // common elements
                     var mediaDiv = document.createElement("div");
                     mediaDiv.className = "media";
@@ -483,7 +442,7 @@ function getAllOrdersWithPermissions(u, p) {
 function getCustomerGraph() {
     var el = document.getElementById('get-datagraph-response');
     el.innerHTML = "";
-    ff.login("adam@bizgraph.com", "Iwantin123", function() {
+    ff.login("adam@bizgraph.com", "asdf", function() {
         ff.getArrayFromUri("/Customers", function(arr) {
             var str = "";
             var elStr = "";
@@ -770,7 +729,7 @@ function everyOrderQuery(userName, password) {
     var el = document.getElementById('query-response');
     el.innerHTML = "";
     // ff.logout();
-    ff.login("adam@bizgraph.com", "Iwantin123", function() {
+    ff.login("adam@bizgraph.com", "asdf", function() {
         ff.getArrayFromUri("/Orders", function(arr) {
             var str = "";
             var elStr = "";
@@ -1030,13 +989,12 @@ function arrayBufferToDataUri(arrayBuffer) {
 }
 // Models
 function Customer(obj) {
-    this.user = new FFUser();
+    this.user = null;
     this.firstName = null;
     this.lastName = null
     this.email = null;
-    this.address = new Address();
+    this.address = null;
     this.phone = null;
-    this.metadata = new FFMetaData();
     // this.vendorAccess = null;
     if(obj) {
         this.user = new FFUser();
@@ -1060,22 +1018,20 @@ function Product(obj) {
     this.sku = null;
     this.qrcode = null;
     this.mfg = null;
-    this.metadata = new FFMetaData();
     if(obj) {
         this.description = obj.description;
         this.sku = obj.sku;
         this.qrcode = obj.qrcode;
-        this.mfg = obj.mfg;
+        this.mfg = new Manufacturer(obj.mfg);
         this.metadata = new FFMetaData(obj);
     }
     return this;
 }
 function OrderLine(obj) {
-    this.product = new Product();
+    this.product = null;
     this.quantity = null;
     this.price = null;
     this.total = null;
-    this.metadata = new FFMetaData();
     if(obj) {
         this.product = new Product(obj.product);
         this.quantity = obj.quantity;
@@ -1086,11 +1042,10 @@ function OrderLine(obj) {
     return this;    
 }
 function Order(obj) {    
-    this.customer = new Customer();
-    this.vendor = new Vendor();
+    this.customer = null;
+    this.vendor = null;
     this.total = null;
-    this.placedAt = new Address();
-    this.metadata = new FFMetaData();
+    this.placedAt = null;
     if(obj) {
         this.customer = new Customer(obj.customer);
         this.vendor = new Vendor(obj.vendor);
@@ -1100,11 +1055,10 @@ function Order(obj) {
     }
     return this;    
 }
-function Vendor (obj) {
+function Vendor(obj) {
     this.name = null;
     this.logo = null;
-    this.address = new Address();
-    this.metadata = new FFMetaData();
+    this.address = null;
     if(obj) {
         this.name = obj.name;
         this.logo = obj.ffUrl + "/logo";
@@ -1113,11 +1067,10 @@ function Vendor (obj) {
     }
     return this;    
 }
-function Manufacturer (obj) {
+function Manufacturer(obj) {
     this.name = null;
-    this.address = new Address();
+    this.address = null;
     this.logo = null;
-    this.metadata = new FFMetaData();
     if(obj) {
         this.name = obj.name;
         this.address = new Address(obj.address);
@@ -1128,9 +1081,8 @@ function Manufacturer (obj) {
 }
 function Price(obj) {
     this.price = null;
-    this.product = new Product();
-    this.vendor = new Vendor();
-    this.metadata = new FFMetaData();
+    this.product = null;
+    this.vendor = null;
     if(obj) {
         this.name = obj.name;
         this.address = new Address(obj.address);
@@ -1145,8 +1097,7 @@ function Address(obj) {
     this.state = null;
     this.country = null;
     this.postCode = null;
-    this.location = new Location();
-    this.metadata = new FFMetaData();
+    this.location = null;
     if(obj) {
         this.street = obj.street;
         this.city = obj.city;
@@ -1160,7 +1111,6 @@ function Address(obj) {
 }
 function Location(obj) {
     this.geo = null;
-    this.metadata = new FFMetaData();
     if(obj) {
         this.geo = obj.geo;
         this.metadata = new FFMetaData(obj);
@@ -1168,9 +1118,8 @@ function Location(obj) {
     return this;    
 }
 function Account(obj) {
-    this.customer = new Customer();
-    this.paymentMethods = [];
-    this.metadata = new FFMetaData();
+    this.customer = null;
+    this.paymentMethods = null;
     if(obj) {
         this.customer = new Customer(obj.customer);
         this.paymentMethods = obj.paymentMethods;
@@ -1180,8 +1129,8 @@ function Account(obj) {
 }
 function ProductImage(obj) {
     this.image = null;
-    this.product = new Product();
-    this.metadata = new FFMetaData();
+    this.product = null;
+    this.metadata = null;
     if(obj) {
         this.image = obj.ffUrl + "/image";
         this.product = new Product(obj.product);
@@ -1192,7 +1141,6 @@ function ProductImage(obj) {
 function Avatar(obj) {
     this.image = null;
     this.nickname = null;
-    this.metadata = new FFMetaData();
     if(obj) {
         this.image = obj.ffUrl + "/image";
         this.nickname = obj.nickname;
@@ -1203,7 +1151,6 @@ function Avatar(obj) {
 function Rating(obj) {
     this.relatesTo = null;
     this.geo = null;
-    this.metadata = new FFMetaData();
     if(obj) {
         this.relatesTo = obj.relatesTo;
         this.geo = obj.geo;
@@ -1215,7 +1162,6 @@ function Comment (obj) {
     this.relatesTo = null;
     this.comment = null;
     this.geo = null;
-    this.metadata = new FFMetaData();
     if(obj) {
         this.relatesTo = obj.relatesTo;
         this.comment = obj.comment;
@@ -1227,7 +1173,6 @@ function Comment (obj) {
 function Like (obj) {
     this.relatesTo = null;
     this.geo = null;
-    this.metadata = new FFMetaData();
     if(obj) {
         this.relatesTo = obj.relatesTo;
         this.geo = obj.geo;
@@ -1237,7 +1182,6 @@ function Like (obj) {
 }
 function QRCode (obj) {
     this.image = null;
-    this.metadata = new FFMetaData();
     if(obj) {
         this.image = obj.ffUrl + "/image";
         this.metadata = new FFMetaData(obj);

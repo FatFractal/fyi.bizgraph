@@ -140,7 +140,7 @@ exports.setUpSysAdmins = function() {
         // register the user
         var reg = {userName:email,firstName:"Adam",lastName:"Bizgraph",email:email};
         if(common.debug) print("models.js.setUpSysAdmins user does not exist, registering:  " + JSON.stringify(reg));
-        usr = ff.registerUser(reg, "Iwantin123", true, false);
+        usr = ff.registerUser(reg, "asdf", true, false);
         count ++;
     }
     var sysAdminGroup = common.getSysAdminGroup();
@@ -174,7 +174,7 @@ exports.createSomeMfgs = function() {
             // register the user
             var reg = {userName:objs[i].adminEmail,firstName:"Adam",lastName:objs[i].name,email:objs[i].adminEmail};
             if(common.debug) print("models.js.createSomeMfgs user does not exist, registering:  " + JSON.stringify(reg));
-            usr = ff.registerUser(reg, "Iwantin123", true, false);
+            usr = ff.registerUser(reg, "asdf", true, false);
             count ++;
         }
         var test = ff.getObjFromUri("/Manufacturers/" + objs[i].name);
@@ -221,7 +221,7 @@ exports.createSomeVendors = function() {
             // register the user
             var reg = {userName:objs[i].adminEmail,firstName:"Adam",lastName:objs[i].name,email:objs[i].adminEmail};
             if(common.debug) print("models.js.createSomeVendors user does not exist, registering:  " + JSON.stringify(reg));
-            usr = ff.registerUser(reg, "Iwantin123", true, false);
+            usr = ff.registerUser(reg, "asdf", true, false);
             count ++;
         }
         var test = ff.getObjFromUri("/Manufacturers/" + objs[i].name);
@@ -342,12 +342,12 @@ exports.createSomeProducts = function() {
 
 exports.createSomeCustomers = function() {
     var objs = [
-    {firstName:"Kevin",lastName:"Nickels",email:"nickelskevin@gmail.com",phone:"+1-650-318-3887",password:"Iwantin123",number:"3420",street:"Finnian Way #410",city:"Dublin",state:"CA",postCode:"94568",country:"USA"},
-    {firstName:"Gary",lastName:"Casey",email:"gary.casey@gmail.com",phone:"+44-7974-457003",password:"Iwantin123",number:"Clifton House",street:"Viewfield Street",city:"Nairn",state:"Scotland",postCode:"IV124HW",country:"UK"},
-    {firstName:"Faisal",lastName:"Hakeem",email:"faisal.7akeem@gmail.com",phone:"+1-408-455-4435",password:"Iwantin123",number:"350",street:"River Oaks Parkway, Apt 1234",city:"San Jose",state:"CA",postCode:"95134",country:"USA"},
-    {firstName:"Mavis",lastName:"Nickels",email:"mavis_2@q.com",phone:"+1-360-573-9785",password:"Iwantin123",number:"16323",street:"NE 94th Avenue",city:"Battleground",state:"WA",postCode:"98604",country:"USA"},
-    {firstName:"Vanessa",lastName:"Schott",email:"vanessa@spotjournal.me",phone:"+1-415-746-0165",password:"Iwantin123",number:"350",street:"River Oaks Parkway, Apt 1234",city:"San Jose",state:"CA",postCode:"95134",country:"USA"},
-    {firstName:"Dave",lastName:"Wells",email:"shawkinaw@gmail.com",phone:"+1-217-714-6872",password:"Iwantin123",number:"4621",street:"Copper Ridge",city:"Champaign",state:"IL",postCode:"61822",country:"USA"},
+    {firstName:"Kevin",lastName:"Nickels",email:"nickelskevin@gmail.com",phone:"+1-650-318-3887",password:"asdf",number:"3420",street:"Finnian Way #410",city:"Dublin",state:"CA",postCode:"94568",country:"USA"},
+    {firstName:"Gary",lastName:"Casey",email:"gary.casey@gmail.com",phone:"+44-7974-457003",password:"asdf",number:"Clifton House",street:"Viewfield Street",city:"Nairn",state:"Scotland",postCode:"IV124HW",country:"UK"},
+    {firstName:"Faisal",lastName:"Hakeem",email:"faisal.7akeem@gmail.com",phone:"+1-408-455-4435",password:"asdf",number:"350",street:"River Oaks Parkway, Apt 1234",city:"San Jose",state:"CA",postCode:"95134",country:"USA"},
+    {firstName:"Mavis",lastName:"Nickels",email:"mavis_2@q.com",phone:"+1-360-573-9785",password:"asdf",number:"16323",street:"NE 94th Avenue",city:"Battleground",state:"WA",postCode:"98604",country:"USA"},
+    {firstName:"Vanessa",lastName:"Schott",email:"vanessa@spotjournal.me",phone:"+1-415-746-0165",password:"asdf",number:"350",street:"River Oaks Parkway, Apt 1234",city:"San Jose",state:"CA",postCode:"95134",country:"USA"},
+    {firstName:"Dave",lastName:"Wells",email:"shawkinaw@gmail.com",phone:"+1-217-714-6872",password:"asdf",number:"4621",street:"Copper Ridge",city:"Champaign",state:"IL",postCode:"61822",country:"USA"},
     ];
     var count = 0;
     for (var i = 0; i < objs.length; i++) {

@@ -13,6 +13,7 @@ SET ApplePushUsingProduction    false
 SET LogLevel                    INFO
 SET PushIsInactive              true
 SET ETaggingEnabled             true
+SET PasswordValidation          false
 # Remove the following CORS setting if you don't wish to be able to use the data browser from the FatFractal Console
 SET CORS http://beta.fatfractal.com https://beta.fatfractal.com https://system.fatfractal.com
 
@@ -77,7 +78,7 @@ CREATE VIRTUAL_COLLECTION /Locations as javascript:require('scripts/Location')
 PERMIT read:none write:system.sysadmins ON /Locations
 
 CREATE COLLECTION /OrderLines OBJECTTYPE OrderLine
-PERMIT read:creator write:object.order.vendor.admins,system.sysadmins ON /OrderLines
+PERMIT read:none write:object.order.vendor.admins,system.sysadmins ON /OrderLines
 
 CREATE COLLECTION /Orders OBJECTTYPE Order
 PERMIT read:none write:object.vendor.admins, system.sysadmins ON /Orders
@@ -99,22 +100,22 @@ PERMIT read:none write:system.sysadmins ON /PaymentMethods
 
 CREATE COLLECTION /ProductImages OBJECTTYPE ProductImage
 #PERMIT create:object.mfg.admins write:system.sysadmins,object.mfg.admins ON /ProductImages
-PERMIT write:system.sysadmins,object.mfg.admins ON /ProductImages
+PERMIT read:public write:system.sysadmins,object.mfg.admins ON /ProductImages
 
 CREATE COLLECTION /Ratings OBJECTTYPE Rating
-PERMIT write:system.sysadmins ON /Ratings
+PERMIT read:public write:system.sysadmins ON /Ratings
 
 CREATE COLLECTION /Comments OBJECTTYPE Comment
-PERMIT write:system.sysadmins ON /Comments
+PERMIT read:public write:system.sysadmins ON /Comments
 
 CREATE COLLECTION /Likes OBJECTTYPE Like
-PERMIT write:system.sysadmins ON /Likes
+PERMIT read:public write:system.sysadmins ON /Likes
 
 CREATE COLLECTION /Favorites OBJECTTYPE Vendor, Comment, Product
 PERMIT read:loggedin write:system.sysadmins ON /Favorites
 
 CREATE COLLECTION /QRCodes OBJECTTYPE QRCode
-PERMIT write:system.sysadmins ON /QRCodes
+PERMIT read:public write:system.sysadmins ON /QRCodes
 
 #
 # Event Handlers
