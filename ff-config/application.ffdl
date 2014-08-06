@@ -58,7 +58,7 @@ CREATE COLLECTION /FFUser OBJECTTYPE FFUser
 PERMIT read:none write:system.sysadmins ON /FFUser
 
 CREATE COLLECTION /FFUserGroup OBJECTTYPE FFUserGroup
-PERMIT read:none write:system.sysadmins ON /FFUserGroup
+PERMIT read:public write:system.sysadmins ON /FFUserGroup
 
 CREATE COLLECTION /FFNotificationID OBJECTTYPE FFNotificationID
 PERMIT read:none write:system.sysadmins ON /FFNotificationID
@@ -89,7 +89,7 @@ CREATE COLLECTION /Manufacturers OBJECTTYPE Manufacturer
 PERMIT read:public write:system.sysadmins,object.admins ON /Manufacturers
 
 CREATE COLLECTION /Addresses OBJECTTYPE Address
-PERMIT read:none write:system.sysadmins ON /Addresses
+PERMIT read:public write:system.sysadmins ON /Addresses
 
 CREATE COLLECTION /Accounts OBJECTTYPE Account
 PERMIT read:none write:system.sysadmins ON /Accounts

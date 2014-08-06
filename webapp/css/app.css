@@ -1,0 +1,18 @@
+/* app css stylesheet */
+
+.btn {
+    min-width: 60px;
+}
+
+/* following makes titles truncate with an ellipsis if they're too long for one line, but unfortunately has the side-effect of chopping off low-hanging letters like 'p' */
+/*
+.console-detail h1 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+*/
+
+.blue{color:blue;}
+.red{color:red;}
+

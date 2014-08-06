@@ -3,10 +3,12 @@ var common = require('scripts/common');
 
 function Customer() {
     this.clazz = "Customer";
-    this.user = null;
-    this.address = null;
+    this.user = new ff.FFUser();
+    this.firstName = null;
+    this.lastName = null;
+    this.email = null;
+    this.address = new Address();
     this.phone = null;
-    this.avatar = null;        
     return this;
 }
 
@@ -31,18 +33,19 @@ function OrderLine() {
     return this;    
 }
 
-function Order() {    
+function Order(o) {    
     this.clazz = "Order";
-    this.customer = null;
+    this.vendor = new Vendor();
+    this.customer = new Customer();
     this.total = null;
-    this.placedAt = null;
+    this.placedAt = new Address();
     return this;    
 }
 
 function Vendor () {
     this.clazz = "Vendor";
     this.name = null;
-    this.address = null;
+    this.address = new Address();
     this.logo = null;
     return this;    
 }
@@ -69,7 +72,7 @@ function Address() {
     this.state = null;
     this.country = null;
     this.postCode = null;
-    this.location = null;
+    this.location = new Location();
     return this;    
 }
 
