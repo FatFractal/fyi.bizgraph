@@ -77,7 +77,7 @@ exports.totalOrder = function() {
     if(order.total == total) {
         if(common.debug) print("models.js.totalOrder no change in total, skipping " + JSON.stringify(order));
     } else {
-        order.total = total;
+        order.total = common.round(total, 2);
         ff.updateObj(order);
         if(common.debug) print("models.js.totalOrder updated order total to " + JSON.stringify(order));
     }

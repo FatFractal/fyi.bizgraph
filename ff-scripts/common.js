@@ -7,24 +7,25 @@ var Scalr   = Packages.org.imgscalr.Scalr; // import the Scalr Java package
 var ImageIO = Packages.javax.imageio.ImageIO; // import the imageIo Java packages
 
 var collections = [
-    {collection:"Customers",objecttype:"Customer"},
-    {collection:"Products",objecttype:"Product"},
-    {collection:"OrderLines",objecttype:"OrderLine"},
-    {collection:"Orders",objecttype:"Order"},
-    {collection:"Vendors",objecttype:"Vendor"},
-    {collection:"Prices",objecttype:"Price"},
-    {collection:"Manufacturers",objecttype:"Manufacturer"},
-    {collection:"Addresses",objecttype:"Address"},
-    {collection:"Accounts",objecttype:"Account"},
-    {collection:"PaymentMethods",objecttype:"PaymentMethod"},
-    {collection:"ProductImages",objecttype:"ProductImage"},
-    {collection:"Avatars",objecttype:"Avatar"},
-    {collection:"Ratings",objecttype:"Rating"},
-    {collection:"Comments",objecttype:"Comment"},
-    {collection:"Ratings",objecttype:"Rating"},
-    {collection:"Likes",objecttype:"Like"},
-    {collection:"Favorites",objecttype:"Vendor, Comment, Product"},
-    {collection:"QRCodes",objecttype:"QRCode"}
+    {collection:"Customers",objecttype:"Customer",virtual:false},
+    {collection:"Products",objecttype:"Product",virtual:false},
+    {collection:"Prices",objecttype:"Price",virtual:false},
+    {collection:"OrderLines",objecttype:"OrderLine",virtual:false},
+    {collection:"Orders",objecttype:"Order",virtual:false},
+    {collection:"Vendors",objecttype:"Vendor",virtual:false},
+    {collection:"Manufacturers",objecttype:"Manufacturer",virtual:false},
+    {collection:"Addresses",objecttype:"Address",virtual:false},
+    {collection:"Accounts",objecttype:"Account",virtual:false},
+    {collection:"PaymentMethods",objecttype:"PaymentMethod",virtual:false},
+    {collection:"ProductImages",objecttype:"ProductImage",virtual:false},
+    {collection:"Avatars",objecttype:"Avatar",virtual:false},
+    {collection:"Ratings",objecttype:"Rating",virtual:false},
+    {collection:"Comments",objecttype:"Comment",virtual:false},
+    {collection:"Ratings",objecttype:"Rating",virtual:false},
+    {collection:"Likes",objecttype:"Like",virtual:false},
+    {collection:"Favorites",objecttype:"Vendor, Comment, Product",virtual:false},
+    {collection:"QRCodes",objecttype:"QRCode",virtual:false},
+    {collection:"Locations",objecttype:"Location",virtual:false,script:"Location"}
 ];
 
 var debug = true;
@@ -83,7 +84,12 @@ exports.getSysAdminGroup = function() {
 
 exports.runDDFLDropCommands = function() {
     for (var i = 0; i < collections.length; i++) {
-        var ffdl = "DROP COLLECTION COMPLETELY /"+collections[i].collection;
+        var ffdl;
+        if(collections[i].vurtual) {
+            ffdl = "DROP COLLECTION /"+collections[i].collection;
+        } else {
+            ffdl = "DROP COLLECTION COMPLETELY /"+collections[i].collection;            
+        }
         if(debug) print("common.js.runDDFLDropCommands "+ffdl);
         ff.executeFFDL(ffdl);
     }
@@ -112,7 +118,13 @@ exports.runDDFLCreateCommands = function() {
     // add the collections
     var count = collections.length;
     for (var i = 0; i < collections.length; i++) {
-        var ffdl = "CREATE COLLECTION /"+collections[i].collection+" OBJECTTYPE "+collections[i].objecttype;
+        var ffdl;
+        if(collections[i].vurtual) {
+            ffdl = "CREATE VIRTUAL_COLLECTION /"+collections[i].collection+" as javascript:require('scripts/"+collections[i].script+"')";
+        } else {
+            ffdl = "CREATE COLLECTION /"+collections[i].collection+" OBJECTTYPE "+collections[i].objecttype;            
+        }
+        ffdl = "CREATE COLLECTION /"+collections[i].collection+" OBJECTTYPE "+collections[i].objecttype;
         if(debug) print("common.js.runDDFLCreateCommands "+ffdl);
         ff.executeFFDL(ffdl);
     }
@@ -144,7 +156,7 @@ exports.makeQRCode = function(data) {
 
 exports.getAddressGEO = function(address) {
     var key = "AIzaSyBdf0wRKywia_Ve8jKibfk7ewNd2lMwQAU";
-    var adStr = address.number+"+"+address.street+",+"+address.city+",+"+address.state+",+"+address.postCode+",+"+address.country;
+    var adStr = address.streetNo+"+"+address.street+",+"+address.city+",+"+address.state+",+"+address.postCode+",+"+address.country;
     adStr = adStr.replace(/\s/g, "+");
     if(debug) print("common.js.getAddressGEO adStr is: "+adStr);
     var adUrl = "https://maps.googleapis.com/maps/api/geocode/json?address="+adStr+"&key="+key;
@@ -201,3 +213,9 @@ function GetThumb(imgUrl, format) {
     }
 }
 exports.getThumb = GetThumb;
+
+function Round(value, decimals) {
+    return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+}
+exports.round = Round;
+

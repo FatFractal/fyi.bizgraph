@@ -27,26 +27,27 @@ CREATE OBJECTTYPE FFNotificationID (idType STRING, idValue STRING)
 DROP OBJECTTYPE Customer
 CREATE OBJECTTYPE Customer (user REFERENCE /FFUser, firstName STRING, lastName STRING, email STRING, address REFERENCE /Addresses, phone STRING, vendorAccess REFERENCE /FFUserGroup)
 DROP OBJECTTYPE Product
-CREATE OBJECTTYPE Product (description STRING, sku STRING, qrcode REFERENCE /QRCodes, mfg REFERENCE /Manufacturers)
+CREATE OBJECTTYPE Product (description STRING, sku STRING, model STRING, weight STRING, qrcode REFERENCE /QRCodes, mfg REFERENCE /Manufacturers, image REFERENCE /ProductImages)
 CREATE ALIAS ON OBJECTTYPE Product GRABBAG BackReferences.OrderLines.product AS orderLines
 DROP OBJECTTYPE Price
 CREATE OBJECTTYPE Price (price NUMERIC, product REFERENCE /Products, vendor REFERENCE /Vendors)
 DROP OBJECTTYPE OrderLine
 CREATE OBJECTTYPE OrderLine (product REFERENCE /Products, order REFERENCE /Orders, quantity NUMERIC, price NUMERIC, total NUMERIC)
 DROP OBJECTTYPE Order
-CREATE OBJECTTYPE Order (vendor REFERENCE /Vendors, customer REFERENCE /Customers, total NUMERIC, placedAt REFERENCE /Addresses)
+CREATE OBJECTTYPE Order (vendor REFERENCE /Vendors, customer REFERENCE /Customers, total NUMERIC, placedAt REFERENCE /Addresses, orderLines GRABBAG /OrderLines)
 DROP OBJECTTYPE Vendor
 CREATE OBJECTTYPE Vendor (name STRING, address REFERENCE /Addresses, logo BYTEARRAY, admins REFERENCE /FFUserGroup)
 DROP OBJECTTYPE Manufacturer
 CREATE OBJECTTYPE Manufacturer (name STRING, address REFERENCE /Addresses, logo BYTEARRAY, admins REFERENCE /FFUserGroup)
 CREATE ALIAS ON OBJECTTYPE Manufacturer GRABBAG BackReferences.Products.mfg AS products
 DROP OBJECTTYPE Address
-CREATE OBJECTTYPE Address (number STRING, street STRING, city STRING, state STRING, country STRING, postCode STRING, location REFERENCE /Locations)
+CREATE OBJECTTYPE Address (streetNo STRING, street STRING, city STRING, state STRING, country STRING, postCode STRING, location REFERENCE /Locations)
 DROP OBJECTTYPE Location
 CREATE OBJECTTYPE Location (geo GEOLOCATION)
 CREATE OBJECTTYPE Account (customer REFERENCE /Customers, paymentMethods GRABBAG /PaymentMethods)
 CREATE OBJECTTYPE PaymentMethod (type STRING, accountNumber ENCRYPTED STRING, nickname ENCRYPTED STRING, expireMonth NUMERIC, expireYear NUMERIC, cvv NUMERIC)
-CREATE OBJECTTYPE ProductImage (image BYTEARRAY, product REFERENCE /Products)
+DROP OBJECTTYPE ProductImage
+CREATE OBJECTTYPE ProductImage (image BYTEARRAY)
 CREATE OBJECTTYPE Avatar (image BYTEARRAY, nickname STRING)
 CREATE OBJECTTYPE Rating (rating STRING, relatesTo REFERENCE, geo REFERENCE /Locations)
 CREATE OBJECTTYPE Comment (comment STRING, relatesTo REFERENCE, geo REFERENCE /Locations)
@@ -75,13 +76,12 @@ CREATE COLLECTION /Prices OBJECTTYPE Price
 PERMIT read:public write:system.sysadmins,object.vendor.admins ON /Prices
 
 CREATE VIRTUAL_COLLECTION /Locations as javascript:require('scripts/Location')
-PERMIT read:none write:system.sysadmins ON /Locations
 
 CREATE COLLECTION /OrderLines OBJECTTYPE OrderLine
 PERMIT read:none write:object.order.vendor.admins,system.sysadmins ON /OrderLines
 
 CREATE COLLECTION /Orders OBJECTTYPE Order
-PERMIT read:none write:object.vendor.admins, system.sysadmins ON /Orders
+PERMIT read:none write:object.vendor.admins,system.sysadmins ON /Orders
 
 CREATE COLLECTION /Vendors OBJECTTYPE Vendor
 PERMIT read:public write:system.sysadmins,object.admins ON /Vendors

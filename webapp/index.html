@@ -5,8 +5,8 @@
     <title>The FatFractal FYI Test Harness</title>
     <script type="text/javascript">
     function httpsRedirect() {
-        var httpURL = window.location.hostname + window.location.pathname;
-        var httpsURL = "https://" + httpURL;
+        var httpURL = window.location.hostname+window.location.pathname;
+        var httpsURL = "https://"+httpURL;
         window.location = httpsURL;
     }
     if (!window.location.href.match('^https://') && !window.location.href.match('^http://localhost'))
@@ -66,16 +66,20 @@
         </div>
         <div class="well" id = "ffdl-section">
             <h2>FFDL</h2>
-            <p>This test application includes the following ffdl definition.<br></p>	
+            <p>This test application includes the following ffdl definition for Customers, Addresses and Locations.<br></p>	
             <div class="well">
-                CREATE OBJECTTYPE Customer (firstName STRING, lastName STRING, gender STRING, mother REFERENCE /Customers, father REFERENCE /Customers, siblings GRABBAG /Customers, picture BYTEARRAY)<br>
-                CREATE COLLECTION /Customers OBJECTTYPE Customer
+                CREATE OBJECTTYPE Customer (user REFERENCE /FFUser, firstName STRING, lastName STRING, email STRING, address REFERENCE /Addresses, phone STRING, vendorAccess REFERENCE /FFUserGroup)<br>
+                CREATE OBJECTTYPE Address (streetNo STRING, street STRING, city STRING, state STRING, country STRING, postCode STRING, location REFERENCE /Locations)<br>
+                CREATE OBJECTTYPE Location (geo GEOLOCATION)<br>
+                CREATE COLLECTION /Customers OBJECTTYPE Customer<br>
+                CREATE COLLECTION /Addresses OBJECTTYPE Address<br>
+                CREATE COLLECTION /Locations OBJECTTYPE Location<br>
             </div>
         </div>
         <div class="well" id = "customer-graph-section">
             <h2>The Customer Graph</h2>
             <p>This example shows the graph response for a random Customer object. Note that the Customer object has embedded FFUser and Address objects and the Address object has an embedded Location object.</p>
-            <button id="customer-graph-button" class="btn" onclick="getRandomCustomerGraph()">Try it!</button><br><br>
+            <button id="customer-graph-button" class="btn" onclick="GetRandomCustomerGraph()">Try it!</button><br><br>
             <ul class="nav nav-tabs" role="tablist" id = "customer-graph-tabs">
                 <li class="active"><a href="#customer-graph-request" role="tab" data-toggle="tab">Request</a></li>
                 <li><a href="#customer-graph-models" role="tab" data-toggle="tab">Models</a></li>
@@ -130,10 +134,10 @@
         <div class="well" id = "orders-permissions-section">
             <h2>Orders with Permissions</h2>
             <p>This example shows how declarative permissions can be used to control access to data using permissions.</p>
-            <button id="orders-permissions-customer-button" class="btn" onclick="getAllOrdersWithPermissions('nickelskevin@gmail.com','asdf')">Customer</button>
-            <button id="orders-permissions-vendor-button" class="btn" onclick="getAllOrdersWithPermissions('adam@bestbuy.com','asdf')">Vendor</button>
-            <button id="orders-permissions-mfg-button" class="btn" onclick="getAllOrdersWithPermissions('adam@zojurushi.com','asdf')">Manufacturer</button>         
-            <button id="orders-permissions-admin-button" class="btn" onclick="getAllOrdersWithPermissions('adam@bizgraph.com','asdf')">System Administrator</button><br><br>
+            <button id="orders-permissions-customer-button" class="btn" onclick="GetAllOrdersWithPermissions('nickelskevin@gmail.com','asdf')">Customer</button>
+            <button id="orders-permissions-vendor-button" class="btn" onclick="GetAllOrdersWithPermissions('adam@bestbuy.com','asdf')">Vendor</button>
+            <button id="orders-permissions-mfg-button" class="btn" onclick="GetAllOrdersWithPermissions('adam@zojurushi.com','asdf')">Manufacturer</button>         
+            <button id="orders-permissions-admin-button" class="btn" onclick="GetAllOrdersWithPermissions('adam@bizgraph.com','asdf')">System Administrator</button><br><br>
             <ul class="nav nav-tabs" role="tablist" id = "orders-permissions-tabs">
                 <li class="active"><a href="#orders-permissions-request" role="tab" data-toggle="tab">Request</a></li>
                 <li><a href="#orders-permissions-models" role="tab" data-toggle="tab">Models</a></li>
@@ -146,7 +150,7 @@
                     <h3>The SDK request looks like this:</h3>
                     <div class="well">
                         <p>var ordersArray;<br>
-                            ff.getObjFromUri("/Orders", function(obj) {
+                            ff.getObjFromUri("/Orders", function(obj) {<br>
                                 &nbsp;&nbsp;&nbsp;&nbsp;ordersArray = obj;<br>
                             });<br>
                         </p>
@@ -200,20 +204,8 @@
                         &nbsp;&nbsp;&nbsp;&nbsp;allBackRefs = response;<br>
                     });<br>
                 </p>
-                <p>var homer, allSiblingBackRefs;<br>
-                    ff.grabBagGetAll(homer, "BackReferences.Customers.siblings", function(response) {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;allSiblingBackRefs = response;<br>
-                    });<br>
-                </p>
-                <p>var homer, allFatherBackRefs;<br>
-                    ff.grabBagGetAll(homer, "BackReferences.Customers.father", function(response) {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;allFatherBackRefs = response;<br>
-                    });<br>
-                </p>
             </div>
             <button id="all-backreference-button" class="btn" onclick="getAllBackReferences('Homer')">Get all Backreferences!</button>
-            <button id="siblings-backreference-button" class="btn" onclick="getSiblingsBackReferences('Homer')">Get siblings Backreferences!</button>
-            <button id="father-backreference-button" class="btn" onclick="getFatherBackReferences('Homer')">Get father Backreferences!</button>
             <br>
             <p id = "backreference-response"></p>
         </div>
@@ -226,32 +218,8 @@
                         &nbsp;&nbsp;&nbsp;&nbsp;fathers = response;<br>
                     });<br>
                 </p>
-                <p>var mothers;<br>
-                    ff.getArrayFromUri("/Customers/()/mother"), function(response) {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;mothers = response;<br>
-                    });<br>
-                </p>
-                <p>var grandfathers;<br>
-                    ff.getArrayFromUri("/Customers/(firstName eq 'Bart')/father or mother/()/father"), function(response) {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;grandfathers = response;<br>
-                    });<br>
-                </p>
-                <p>var grandparents;<br>
-                    ff.getArrayFromUri("/Customers/(firstName eq 'Bart')/father or mother/()/mother or father"), function(response) {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;grandparents = response;<br>
-                    });<br>
-                </p>
-                <p>var cousins;<br>
-                    ff.getArrayFromUri("/Customers/(firstName eq 'Ling')/father or mother/()/siblings/()/BackReferences.Customers.mother or BackReferences.Customers.father"), function(response) {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;cousins = response;<br>
-                    });<br>
-                </p>
             </div>
             <button id="orders-query-button" class="btn" onclick="everyOrderQuery()">All fathers!</button>
-            <button id="mothers-query-button" class="btn" onclick="everyMotherQuery()">All mothers!</button>
-            <button id="grandorders-query-button" class="btn" onclick="grandfathersQuery('Bart')">Bart's grandfathers!</button>
-            <button id="grandparents-query-button" class="btn" onclick="grandparentsQuery('Bart')">Bart's grandparents!</button>
-            <button id="cousins-query-button" class="btn" onclick="cousinsQuery('Ling')">Ling's cousins!</button>
             <br>
             <p id = "query-response"></p>
         </div>
@@ -261,8 +229,8 @@
 <script type="text/javascript">
 // View elements
 function OrderElement(order) {
-    var ordersWrap = document.createElement("div");
-    ordersWrap.className = "well";
+    if (ff.debug) console.log("OrderElement() received order: "+order.guid+" that has "+order.orderLines.length+" orderLines");
+    if (ff.debug) console.log("OrderElement() vendor is: "+JSON.stringify(order.vendor));
     var mediaDiv = document.createElement("div");
     mediaDiv.className = "media";
     var imgA = document.createElement("a");
@@ -270,65 +238,95 @@ function OrderElement(order) {
     imgA.style.clear = 'both'
     var img = document.createElement("img");
     img.className = "media-object";
-    img.src = "/bizgraph"+order.vendor.logo;
+    // img.src = "/bizgraph"+order.vendor.logo;
+    img.src = "/bizgraph"+order.vendor.ffUrl+"/logo";
     var mediaHeading = document.createElement("p");
     var mediaBody = document.createElement("div");
+    mediaBody.className = "media-body";		 
+    var ordersP = document.createElement("p");
     var ordersT = document.createElement("t");
     var ordersTHR = document.createElement("tr");
     var orderSummary = document.createElement("p");
     mediaHeading.className = "media-heading";		 
     var v = order.vendor.name;
-    var d = new Date(order.metadata.createdAt);
-    mediaHeading.innerHTML = "Placed with <strong>"+v+"</strong> on "+d;
-    var ordersStr= "<th style=text-align:center>Item</th>"+
-    "<th style=text-align:center>Quantity</th>"+
-    "<th>Description</th>"+
-    "<th style=text-align:center>Price</th>"+
-    "<th style=text-align:center>Total</th>"
+    // var d = new Date(order.metadata.createdAt);
+    var d = new Date(order.createdAt);
+    var c = order.orderLines.length;
+    // var g = order.metadata.guid;
+    var g = order.guid;
+    ordersP.innerHTML = "<strong>Delivery Address:</strong><br>"+
+        order.customer.firstName+
+        " "+order.customer.lastName+
+        "<br>"+
+        order.customer.address.streetNo+
+        " "+order.customer.address.street+
+        "<br>"+
+        order.customer.address.city+
+        ", "+order.customer.address.state+
+        ", "+order.customer.address.postCode+
+        ", "+order.customer.address.country;
+    mediaHeading.innerHTML = "Order "+g+", placed with <strong>"+v+"</strong> on "+d+" containing "+c+" items";
+        var ordersStr= "<th style=text-align:center>Item</th>"+
+        "<th style=text-align:center>Quantity</th>"+
+        "<th>Description</th>"+
+        "<th style=text-align:center>Price</th>"+
+        "<th style=text-align:center>Total</th>"
     ordersTHR.innerHTML = ordersStr;
-    ordersWrap.appendChild(mediaDiv);
     mediaDiv.appendChild(imgA);
     imgA.appendChild(img);
-    ordersWrap.appendChild(mediaHeading);
-    ordersWrap.appendChild(ordersT);
+    mediaDiv.appendChild(mediaHeading);
+    mediaDiv.appendChild(mediaBody);
+    mediaBody.appendChild(ordersP);
+    mediaBody.appendChild(ordersT);
     ordersT.appendChild(ordersTHR);
-    ordersWrap.appendChild(orderSummary);
+    mediaBody.appendChild(orderSummary);
     orderSummary.innerHTML = "<br>Order total: "+order.total;
-    ff.getArrayFromUri(order.metadata.ffUrl+"/BackReferences.OrderLines", function(ols) {
-        if(!ols || ols.length <= 0) {
-            ordersWrap.innerHTML = "You do not have permission to see any OrderLine objects from the /OrderLines collection."
-        } else {
-            console.log("OrderElement.getArrayFromUri() retrieved: " + ols.length + " OrderLines");
-            for(var i = 0; i < ols.length; i++) {
-                var ol = new OrderLine(ols[i]);
-                var url = ol.product.metadata.ffUrl+"/BackReferences.ProductImages.product";
-                var itemTR = document.createElement("tr");
-                // var str = "<td width=150px; height=150px; align=center valign=middle><img src=/bizgraph"+p.image+"></img></td>"+
-                var str = "<td width=150px; height=150px; align=center valign=middle></td>"+
-                "<td width=70px; style=text-align:center>"+ol.quantity+"</td>"+
-                "<td width=300px;>"+ol.product.description+"</td>"+
-                "<td width=70px; style=text-align:center>$"+ol.price+"</td>"+
-                "<td width=70px; style=text-align:center>$"+ol.total+"</td>"
-                itemTR.innerHTML = str;
-                ordersT.appendChild(itemTR);
-                ff.getObjFromUri(url, function(pi) {
-                    var p = new ProductImage(pi);
-                }, function(code, msg) {
-                    ordersWrap.innerHTML = "<br><div class = 'well red'>OrderElement.getObjFromUri() error: " + msg + "</div>";
-                    console.error("OrderElement.getObjFromUri() Error: " + code + " " + msg);
-                });
-            }
-        }
-    }, function(code, msg) {
-        ordersWrap.innerHTML = "<br><div class = 'well red'>OrderElement.getObjFromUri() error: " + msg + "</div>";
-        console.error("OrderElement.getObjFromUri() Error: " + code + " " + msg);
-    });
-    return ordersWrap;    
+    for(var i = 0; i < order.orderLines.length; i++) {
+        if (ff.debug) console.log("OrderElement() product is: "+JSON.stringify(order.orderLines[i].product));
+        var orderLineElement = new OrderLineElement(order.orderLines[i]);
+        ordersT.appendChild(orderLineElement);    
+    }
+    return mediaDiv;    
+}
+function OrderLineElement(orderLine) {
+    var itemTR = document.createElement("tr");
+    var str = "<td width=150px; height=150px; align=center valign=middle><img src=/bizgraph"+orderLine.product.image.ffUrl+"/image></img></td>"+
+    "<td width=70px; style=text-align:center>"+orderLine.quantity+"</td>"+
+    "<td width=300px;>"+orderLine.product.description+"</td>"+
+    "<td width=70px; style=text-align:center>$"+orderLine.price+"</td>"+
+    "<td width=70px; style=text-align:center>$"+orderLine.total+"</td>"+
+    "<td width=150px; height=150px; align=center valign=middle><img src=/bizgraph"+orderLine.product.qrcode.ffUrl+"/image></img></td>"
+    itemTR.innerHTML = str;
+    return itemTR;
+}
+function OrdersJSONElement (ordersArr) {
+    if (ff.debug) console.log("OrdersJSONElement received: "+ordersArr.length+" orders.");
+    var elStr = "";
+    var wellWrap = document.createElement("div");
+    wellWrap.className = "well blue";
+    var responseP = document.createElement("p");
+    wellWrap.appendChild(responseP);    
+    if(!ordersArr || ordersArr.length <= 0) {
+        elStr = "You do not have permission to see any Order objects from the /Orders collection."
+    } else {
+        var word = "object was";
+        if(ordersArr.length > 1) word = "objects were"
+        elStr = ordersArr.length +" Order "+word+" retrieved from the /Orders Collection with data: ";
+        var str = js_beautify(JSON.stringify(ordersArr), {
+            indent_size: 4,
+            indent_char: '&nbsp;',
+            linefeed_char: '<br>'
+        });
+        elStr += str;
+    }
+    responseP.innerHTML = elStr;
+    return wellWrap;
 }
 // View methods
-function getRandomCustomerGraph() {
+function GetRandomCustomerGraph() {
     var el = document.getElementById('customer-graph-response');
     el.innerHTML = "";
+    // login as admin to get access to all customer records
     ff.login("adam@bizgraph.com", "asdf", function() {
         ff.getObjFromUri("/Customers/(guid eq random(guid))", function(obj) {
             var str = "";
@@ -349,97 +347,67 @@ function getRandomCustomerGraph() {
                 el.appendChild(wellWrap);
                 var responseP = document.createElement("p");
                 wellWrap.appendChild(responseP);
-                elStr = "A Customer object was retrieved from the /Customers Collection with data: " + str;
+                elStr = "A Customer object was retrieved from the /Customers Collection with data: "+str;
                 responseP.innerHTML = elStr;
                 $('#customer-graph-tabs a[href="#customer-graph-response"]').tab('show') // Select tab by name
             }
         }, function(code, msg) {
-            el.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-            console.error("getCustomerGraph.getArrayFromUri() getArrayFromUri Error: " + code + " " + msg);
+            el.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
+            console.error("GetCustomerGraph.getArrayFromUri() getArrayFromUri Error: "+code+" "+msg);
         });
     }, function(code, msg) {
-        el.innerHTML = "<br><div class = 'well red'>Got a login error: " + msg + "</div>";
-        console.error("getCustomerGraph.login() Error: " + code + " " + msg);
+        el.innerHTML = "<br><div class = 'well red'>Got a login error: "+msg+"</div>";
+        console.error("GetCustomerGraph.login() Error: "+code+" "+msg);
     });
 }
-function getAllOrdersWithPermissions(u, p) {
-    var ordersEl = document.getElementById('orders-permissions-response-orders');
-    var el = document.getElementById('orders-permissions-response-json');
-    el.innerHTML = "";
-    ordersEl.innerHTML = "";
-    console.log("getAllOrdersWithPermissions logging is as userName: "+u+", password: "+p);
+function GetAllOrdersWithPermissions(u, p) {
+    if (ff.debug) console.log("GetAllOrdersWithPermissions logging is as userName: "+u+", password: "+p);
+    var ordersResponseEl = document.getElementById('orders-permissions-response-orders');
+    var ordersResponseJSONEl = document.getElementById('orders-permissions-response-json');
+    // Login the user
     ff.login(u, p, function() {
-        ff.getArrayFromUri("/Orders", function(arr) {
-            var str = "";
-            var elStr = "";
-            var heading = document.createElement("h3");
-            heading.innerHTML = "Response:"
-            el.appendChild(heading);
-            var ordersH3 = document.createElement("h3");
-            ordersEl.appendChild(ordersH3);
-            var ordersP = document.createElement("p");
-            ordersEl.appendChild(ordersP);
-            var wellWrap = document.createElement("div");
-            wellWrap.className = "well blue";
-            el.appendChild(wellWrap);
-            var responseP = document.createElement("p");
-            if(!arr || arr.length <= 0) {
-                elStr = "You do not have permission to see any Order objects from the /Orders collection."
+        // get all orders for the user
+        ff.getArrayFromUri("/Orders", function(ordersArr) {
+            ordersResponseEl.innerHTML= "";
+            $('#orders-permissions-tabs a[href="#orders-permissions-response-orders"]').tab('show'); // Select tab by name
+            if(!ordersArr || ordersArr.length <= 0) {
+                ordersResponseEl.innerHTML = "<br>You do not have permission to see any Order objects from the /Orders collection."
             } else {
-                for(var i = 0; i < arr.length; i++) {
-                    var order = new Order(arr[i]);
-                    ordersH3.innerHTML = "Orders for: "+order.customer.firstName+" "+order.customer.lastName;
-                    ordersP.innerHTML = order.customer.address.number+" "+order.customer.address.street+"<br>"+
-                    order.customer.address.city+", "+order.customer.address.state+", "+order.customer.address.postCode+", "+order.customer.address.country;
-                    var orderMeta = new FFMetaData(arr[i]);
-                    // common elements
-                    var mediaDiv = document.createElement("div");
-                    mediaDiv.className = "media";
-                    var imgA = document.createElement("a");
-                    imgA.className = "pull-left";
-                    imgA.style.clear = 'both'
-                    var img = document.createElement("img");
-                    img.className = "media-object";
-                    img.src = "/bizgraph"+order.vendor.logo;
-                    var mediaHeading = document.createElement("p");
-                    mediaHeading.className = "media-heading";		 
-                    var mediaBody = document.createElement("div");
-                    mediaBody.className = "media-body";		 
-                    mediaDiv.appendChild(imgA);
-                    imgA.appendChild(img); 
-                    mediaDiv.appendChild(mediaHeading); 
-                    mediaDiv.appendChild(mediaBody); 
-                    // Order form element
-                    var orderEl = new OrderElement(order);
-                    ordersEl.appendChild(orderEl);
-                    // JSON response view
-                    wellWrap.appendChild(mediaDiv);
-                    var word = "object was";
-                    if(arr.length > 1) word = "objects were"
-                    elStr = arr.length +" Order "+word+" retrieved from the /Orders Collection with data: ";
-                    str = js_beautify(JSON.stringify(order), {
-                        indent_size: 4,
-                        indent_char: '&nbsp;',
-                        linefeed_char: '<br>'
+                if (ff.debug) console.log("GetAllOrdersWithPermissions.getArrayFromUri() Retrieved: "+ordersArr.length+" orders.");
+                ordersResponseEl.innerHTML = "";
+                var ordersH3 = document.createElement("h3");
+                ordersH3.innerHTML = "Retrieved "+ordersArr.length+" Orders.";
+                ordersResponseEl.appendChild(ordersH3);
+                function AddOrderLines(order) {
+                    ff.grabBagGetAll(order, "orderLines", function(orderLines) {
+                        order.orderLines = orderLines;
+                        var orderEl = new OrderElement(order);
+                        ordersResponseEl.appendChild(orderEl);
+                    }, function(code, msg) {
+                        ordersResponseEl.innerHTML = "<br><div class = 'well red'>OrderElement.getObjFromUri() error: "+msg+"</div>";
+                        ordersResponseJSONEl.innerHTML = "<br><div class = 'well red'>OrderElement.getObjFromUri() error: "+msg+"</div>";
+                        console.error("GetAllOrdersWithPermissions.grabBagGetAll() Error: "+code+" "+msg);
                     });
-                    elStr += str;
+                }                            
+                for(var i = 0; i < ordersArr.length; i++) {
+                    AddOrderLines(ordersArr[i]);
                 }
+                ordersResponseJSONEl.innerHTML= "";
+                var ordersJSONEl = new OrdersJSONElement(ordersArr);
+                ordersResponseJSONEl.appendChild(ordersJSONEl);
             }
-            wellWrap.appendChild(responseP);
-            responseP.innerHTML = elStr;
-            $('#orders-permissions-tabs a[href="#orders-permissions-response-orders"]').tab('show') // Select tab by name
         }, function(code, msg) {
-            el.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-            ordersEl.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-            console.error("getAllOrdersWithPermissions.getArrayFromUri() getArrayFromUri Error: " + code + " " + msg);
+            el.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
+            ordersResponseEl.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
+            console.error("GetAllOrdersWithPermissions.getArrayFromUri() getArrayFromUri Error: "+code+" "+msg);
         });
     }, function(code, msg) {
-        el.innerHTML = "<br><div class = 'well red'>Got a login error: " + msg + "</div>";
-        ordersEl.innerHTML = "<br><div class = 'well red'>Got a login error: " + msg + "</div>";
-        console.error("getAllOrdersWithPermissions.login() Error: " + code + " " + msg);
+        el.innerHTML = "<br><div class = 'well red'>Got a login error: "+msg+"</div>";
+        ordersResponseEl.innerHTML = "<br><div class = 'well red'>Got a login error: "+msg+"</div>";
+        console.error("GetAllOrdersWithPermissions.login() Error: "+code+" "+msg);
     });
-}
-function getCustomerGraph() {
+} 
+function GetCustomerGraph() {
     var el = document.getElementById('get-datagraph-response');
     el.innerHTML = "";
     ff.login("adam@bizgraph.com", "asdf", function() {
@@ -467,7 +435,7 @@ function getCustomerGraph() {
                     // imgA.style.clear = 'both';
                     // var img = document.createElement("img");
                     // img.className = "media-object";
-                    // img.src = arrayBufferToDataUri(arr[i].picture);
+                    // img.src = ArrayBufferToDataUri(arr[i].picture);
                     // imgA.appendChild(img);
                     // mediaDiv.appendChild(imgA);
                 }
@@ -478,514 +446,43 @@ function getCustomerGraph() {
                 });
                 mediaDiv.appendChild(mediaBody); 
                 mediaBody.appendChild(mediaHeading); 
-                elStr = arr.length + " Customer objects were retrieved from the Customers Collection with data: " + str;
-                mediaHeading.innerHTML = "<br><div class = 'well blue'>" + elStr + "</div>";
+                elStr = arr.length+" Customer objects were retrieved from the Customers Collection with data: "+str;
+                mediaHeading.innerHTML = "<br><div class = 'well blue'>"+elStr+"</div>";
             }
         }, function(code, msg) {
-            el.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-            console.error("getCustomerGraph.getArrayFromUri() getArrayFromUri Error: " + code + " " + msg);
+            el.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
+            console.error("GetCustomerGraph.getArrayFromUri() getArrayFromUri Error: "+code+" "+msg);
         });
     }, function(code, msg) {
-        el.innerHTML = "<br><div class = 'well red'>Got a login error: " + msg + "</div>";
-        console.error("getCustomerGraph.login() Error: " + code + " " + msg);
+        el.innerHTML = "<br><div class = 'well red'>Got a login error: "+msg+"</div>";
+        console.error("GetCustomerGraph.login() Error: "+code+" "+msg);
     });
 }
-function getReferenceFromCustomerByFirstName(firstName) {
-    var el = document.getElementById('customer-reference-response');
-    el.innerHTML = "";
-    ff.getObjFromUri("/Customers/(firstName eq '" + firstName + "')/father", function(p) {
-        var customer = new Customer(p);
-        var str = "";
-        var elStr = "";
-        if(!customer) alert("Could not find Customer with firstName " + firstName + "!");
-        else {
-            var wellWrap = document.createElement("div");
-            wellWrap.className = "well blue";
-            var mediaDiv = document.createElement("div");
-            mediaDiv.className = "media";
-            var imgA = document.createElement("a");
-            imgA.className = "pull-left";
-            imgA.style.clear = 'both'
-            var img = document.createElement("img");
-            img.className = "media-object";
-            img.src = arrayBufferToDataUri(customer.picture);
-            var mediaBody = document.createElement("div");
-            mediaBody.className = "media-body";		 
-            var mediaHeading = document.createElement("p");
-            mediaHeading.className = "media-heading";		 
-            el.appendChild(wellWrap);
-            wellWrap.appendChild(mediaDiv);
-            mediaDiv.appendChild(imgA);
-            imgA.appendChild(img); 
-            mediaDiv.appendChild(mediaBody); 
-            mediaBody.appendChild(mediaHeading); 
-            var printMe = customer.printMe();
-            str = js_beautify(JSON.stringify(printMe), {
-                indent_size: 4,
-                indent_char: '&nbsp;',
-                linefeed_char: '<br>'
-            });
-            elStr += "Customer was retrieved from the  " +
-            p.ffRL + " Collection with data: " +
-            str + "<br>";
-            mediaHeading.innerHTML = elStr;
-        }
-    }, function(code, msg) {
-        el.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-        console.error("getCustomer() getObjFromUri Error: " + code + " " + msg);
-    });
-}
-function getGrabbagFromCustomerByFirstName(firstName) {
-    var el = document.getElementById('get-grabbag-response');
-    el.innerHTML = "";
-    ff.getArrayFromUri("/Customers/(firstName eq '" + firstName + "')/mother/()/siblings/(gender eq 'Female')", function(arr) {
-        var str = "";
-        var elStr = "";
-        var outArray = [];
-        if(arr.length <= 0) alert("Create some Customer objects in the Customers Collection first!");
-        else {
-            var wellWrap = document.createElement("div");
-            wellWrap.className = "well blue";
-            var mediaDiv = document.createElement("div");
-            mediaDiv.className = "media";
-            var mediaBody = document.createElement("div");
-            mediaBody.className = "media-body";		 
-            var mediaHeading = document.createElement("p");
-            mediaHeading.className = "media-heading";		 
-            el.appendChild(wellWrap);
-            wellWrap.appendChild(mediaDiv);
-            for(var i = 0; i < arr.length; i++) {
-                var p = new Customer(arr[i]).printMe();
-                outArray.push(p);
-                var imgA = document.createElement("a");
-                imgA.className = "pull-left";
-                imgA.style.clear = 'both'
-                var img = document.createElement("img");
-                img.className = "media-object";
-                img.src = arrayBufferToDataUri(arr[i].picture);
-                imgA.appendChild(img); 
-                mediaDiv.appendChild(imgA);
-            }
-            str = js_beautify(JSON.stringify(outArray), {
-                indent_size: 4,
-                indent_char: '&nbsp;',
-                linefeed_char: '<br>'
-            });
-            mediaDiv.appendChild(mediaBody); 
-            mediaBody.appendChild(mediaHeading); 
-            elStr = arr.length + " Customer objects were retrieved from the Customers Collection with data: " + str;
-            mediaHeading.innerHTML = "<br><div class = 'well blue'>" + elStr + "</div>";
-        }
-    }, function(code, msg) {
-        el.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-        console.error("getActorsFromFavs() getArrayFromUri Error: " + code + " " + msg);
-    });
-}
-function getAllBackReferences(firstName) {
-    var el = document.getElementById('backreference-response');
-    el.innerHTML = "";
-    ff.getObjFromUri("/Customers/(firstName eq '" + firstName + "')", function(obj) {
-        ff.grabBagGetAll(obj, "BackReferences", function(arr) {
-            var str = "";
-            var elStr = "";
-            var outArray = [];
-            if(arr.length <= 0) alert("Create some Customer objects in the Customers Collection first!");
-            else {
-                var wellWrap = document.createElement("div");
-                wellWrap.className = "well blue";
-                var mediaDiv = document.createElement("div");
-                mediaDiv.className = "media";
-                var mediaBody = document.createElement("div");
-                mediaBody.className = "media-body";		 
-                var mediaHeading = document.createElement("p");
-                mediaHeading.className = "media-heading";		 
-                el.appendChild(wellWrap);
-                wellWrap.appendChild(mediaDiv);
-                for(var i = 0; i < arr.length; i++) {
-                    var p = new Customer(arr[i]).printMe();
-                    outArray.push(p);
-                    var imgA = document.createElement("a");
-                    imgA.className = "pull-left";
-                    imgA.style.clear = 'both'
-                    var img = document.createElement("img");
-                    img.className = "media-object";
-                    img.src = arrayBufferToDataUri(arr[i].picture);
-                    imgA.appendChild(img); 
-                    mediaDiv.appendChild(imgA);
-                }
-                str = js_beautify(JSON.stringify(outArray), {
-                    indent_size: 4,
-                    indent_char: '&nbsp;',
-                    linefeed_char: '<br>'
-                });
-                mediaDiv.appendChild(mediaBody); 
-                mediaBody.appendChild(mediaHeading); 
-                elStr = arr.length + " Customer objects were retrieved from the Customers Collection with data: " + str;
-                mediaHeading.innerHTML = "<br><div class = 'well blue'>" + elStr + "</div>";
-            }
-        });
-    }, function(code, msg) {
-        el.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-        console.error("getActorsFromFavs() getArrayFromUri Error: " + code + " " + msg);
-    });
-}
-function getSiblingsBackReferences(firstName) {
-    var el = document.getElementById('backreference-response');
-    el.innerHTML = "";
-    ff.getObjFromUri("/Customers/(firstName eq '" + firstName + "')", function(obj) {
-        ff.grabBagGetAll(obj, "BackReferences.Customers.siblings", function(arr) {
-            var str = "";
-            var elStr = "";
-            var outArray = [];
-            if(arr.length <= 0) alert("Create some Customer objects in the Customers Collection first!");
-            else {
-                var wellWrap = document.createElement("div");
-                wellWrap.className = "well blue";
-                var mediaDiv = document.createElement("div");
-                mediaDiv.className = "media";
-                var mediaBody = document.createElement("div");
-                mediaBody.className = "media-body";		 
-                var mediaHeading = document.createElement("p");
-                mediaHeading.className = "media-heading";		 
-                el.appendChild(wellWrap);
-                wellWrap.appendChild(mediaDiv);
-                for(var i = 0; i < arr.length; i++) {
-                    var p = new Customer(arr[i]).printMe();
-                    outArray.push(p);
-                    var imgA = document.createElement("a");
-                    imgA.className = "pull-left";
-                    imgA.style.clear = 'both'
-                    var img = document.createElement("img");
-                    img.className = "media-object";
-                    img.src = arrayBufferToDataUri(arr[i].picture);
-                    imgA.appendChild(img); 
-                    mediaDiv.appendChild(imgA);
-                }
-                str = js_beautify(JSON.stringify(outArray), {
-                    indent_size: 4,
-                    indent_char: '&nbsp;',
-                    linefeed_char: '<br>'
-                });
-                mediaDiv.appendChild(mediaBody); 
-                mediaBody.appendChild(mediaHeading); 
-                elStr = arr.length + " Customer objects were retrieved from the Customers Collection with data: " + str;
-                mediaHeading.innerHTML = "<br><div class = 'well blue'>" + elStr + "</div>";
-            }
-        });
-    }, function(code, msg) {
-        el.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-        console.error("getActorsFromFavs() getArrayFromUri Error: " + code + " " + msg);
-    });
-}
-function getFatherBackReferences(firstName) {
-    var el = document.getElementById('backreference-response');
-    el.innerHTML = "";
-    ff.getObjFromUri("/Customers/(firstName eq '" + firstName + "')", function(obj) {
-        ff.grabBagGetAll(obj, "BackReferences.Customers.father", function(arr) {
-            var str = "";
-            var elStr = "";
-            var outArray = [];
-            if(arr.length <= 0) alert("Create some Customer objects in the Customers Collection first!");
-            else {
-                var wellWrap = document.createElement("div");
-                wellWrap.className = "well blue";
-                var mediaDiv = document.createElement("div");
-                mediaDiv.className = "media";
-                var mediaBody = document.createElement("div");
-                mediaBody.className = "media-body";		 
-                var mediaHeading = document.createElement("p");
-                mediaHeading.className = "media-heading";		 
-                el.appendChild(wellWrap);
-                wellWrap.appendChild(mediaDiv);
-                for(var i = 0; i < arr.length; i++) {
-                    var p = new Customer(arr[i]).printMe();
-                    outArray.push(p);
-                    var imgA = document.createElement("a");
-                    imgA.className = "pull-left";
-                    imgA.style.clear = 'both'
-                    var img = document.createElement("img");
-                    img.className = "media-object";
-                    img.src = arrayBufferToDataUri(arr[i].picture);
-                    imgA.appendChild(img); 
-                    mediaDiv.appendChild(imgA);
-                }
-                str = js_beautify(JSON.stringify(outArray), {
-                    indent_size: 4,
-                    indent_char: '&nbsp;',
-                    linefeed_char: '<br>'
-                });
-                mediaDiv.appendChild(mediaBody); 
-                mediaBody.appendChild(mediaHeading); 
-                elStr = arr.length + " Customer objects were retrieved from the Customers Collection with data: " + str;
-                mediaHeading.innerHTML = "<br><div class = 'well blue'>" + elStr + "</div>";
-            }
-        });
-    }, function(code, msg) {
-        el.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-        console.error("getActorsFromFavs() getArrayFromUri Error: " + code + " " + msg);
-    });
-}
-function everyOrderQuery(userName, password) {
-    var el = document.getElementById('query-response');
-    el.innerHTML = "";
-    // ff.logout();
-    ff.login("adam@bizgraph.com", "asdf", function() {
-        ff.getArrayFromUri("/Orders", function(arr) {
-            var str = "";
-            var elStr = "";
-            var outArray = [];
-            if(arr.length <= 0) alert("Create some Order objects in the Orders Collection first!");
-            else {
-                var wellWrap = document.createElement("div");
-                wellWrap.className = "well blue";
-                var mediaDiv = document.createElement("div");
-                mediaDiv.className = "media";
-                var mediaBody = document.createElement("div");
-                mediaBody.className = "media-body";		 
-                var mediaHeading = document.createElement("p");
-                mediaHeading.className = "media-heading";		 
-                el.appendChild(wellWrap);
-                wellWrap.appendChild(mediaDiv);
-                for(var i = 0; i < arr.length; i++) {
-                    var p = new Customer(arr[i]).printMe();
-                    outArray.push(p);
-                    var imgA = document.createElement("a");
-                    imgA.className = "pull-left";
-                    imgA.style.clear = 'both'
-                    var img = document.createElement("img");
-                    img.className = "media-object";
-                    img.src = arrayBufferToDataUri(arr[i].picture);
-                    imgA.appendChild(img); 
-                    mediaDiv.appendChild(imgA);
-                }
-                str = js_beautify(JSON.stringify(outArray), {
-                    indent_size: 4,
-                    indent_char: '&nbsp;',
-                    linefeed_char: '<br>'
-                });
-                mediaDiv.appendChild(mediaBody); 
-                mediaBody.appendChild(mediaHeading); 
-                elStr = arr.length + " Customer objects were retrieved from the Customers Collection with data: " + str;
-                mediaHeading.innerHTML = "<br><div class = 'well blue'>" + elStr + "</div>";
-            }
-        }, function(code, msg) {
-            el.innerHTML = "<br><div class = 'well red'>Got a retrieve error: " + msg + "</div>";
-            console.error("everyOrderQuery() getArrayFromUri Error: " + code + " " + msg);
-        });       
-    }, function(code, msg) {
-        el.innerHTML = "<br><div class = 'well red'>Got a login error: " + msg + "</div>";
-        console.error("everyOrderQuery() login Error: " + code + " " + msg);
-    });
-}
-function everyMotherQuery() {
-    var el = document.getElementById('query-response');
-    el.innerHTML = "";
-    ff.getArrayFromUri("/Customers/()/mother", function(arr) {
-        var str = "";
-        var elStr = "";
-        var outArray = [];
-        if(arr.length <= 0) alert("Create some Customer objects in the Customers Collection first!");
-        else {
-            var wellWrap = document.createElement("div");
-            wellWrap.className = "well blue";
-            var mediaDiv = document.createElement("div");
-            mediaDiv.className = "media";
-            var mediaBody = document.createElement("div");
-            mediaBody.className = "media-body";		 
-            var mediaHeading = document.createElement("p");
-            mediaHeading.className = "media-heading";		 
-            el.appendChild(wellWrap);
-            wellWrap.appendChild(mediaDiv);
-            for(var i = 0; i < arr.length; i++) {
-                var p = new Customer(arr[i]).printMe();
-                outArray.push(p);
-                var imgA = document.createElement("a");
-                imgA.className = "pull-left";
-                imgA.style.clear = 'both'
-                var img = document.createElement("img");
-                img.className = "media-object";
-                img.src = arrayBufferToDataUri(arr[i].picture);
-                imgA.appendChild(img); 
-                mediaDiv.appendChild(imgA);
-            }
-            str = js_beautify(JSON.stringify(outArray), {
-                indent_size: 4,
-                indent_char: '&nbsp;',
-                linefeed_char: '<br>'
-            });
-            mediaDiv.appendChild(mediaBody); 
-            mediaBody.appendChild(mediaHeading); 
-            elStr = arr.length + " Customer objects were retrieved from the Customers Collection with data: " + str;
-            mediaHeading.innerHTML = "<br><div class = 'well blue'>" + elStr + "</div>";
-        }
-    }, function(code, msg) {
-        el.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-        console.error("getActorsFromFavs() getArrayFromUri Error: " + code + " " + msg);
-    });
-}
-function grandfathersQuery(firstName) {
-    var el = document.getElementById('query-response');
-    el.innerHTML = "";
-    ff.getArrayFromUri("/Customers/(firstName eq '" + firstName + "')/father or mother/()/father", function(arr) {
-        var str = "";
-        var elStr = "";
-        var outArray = [];
-        if(arr.length <= 0) alert("Create some Customer objects in the Customers Collection first!");
-        else {
-            var wellWrap = document.createElement("div");
-            wellWrap.className = "well blue";
-            var mediaDiv = document.createElement("div");
-            mediaDiv.className = "media";
-            var mediaBody = document.createElement("div");
-            mediaBody.className = "media-body";		 
-            var mediaHeading = document.createElement("p");
-            mediaHeading.className = "media-heading";		 
-            el.appendChild(wellWrap);
-            wellWrap.appendChild(mediaDiv);
-            for(var i = 0; i < arr.length; i++) {
-                var p = new Customer(arr[i]).printMe();
-                outArray.push(p);
-                var imgA = document.createElement("a");
-                imgA.className = "pull-left";
-                imgA.style.clear = 'both'
-                var img = document.createElement("img");
-                img.className = "media-object";
-                img.src = arrayBufferToDataUri(arr[i].picture);
-                imgA.appendChild(img); 
-                mediaDiv.appendChild(imgA);
-            }
-            str = js_beautify(JSON.stringify(outArray), {
-                indent_size: 4,
-                indent_char: '&nbsp;',
-                linefeed_char: '<br>'
-            });
-            mediaDiv.appendChild(mediaBody); 
-            mediaBody.appendChild(mediaHeading); 
-            elStr = arr.length + " Customer objects were retrieved from the Customers Collection with data: " + str;
-            mediaHeading.innerHTML = "<br><div class = 'well blue'>" + elStr + "</div>";
-        }
-    }, function(code, msg) {
-        el.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-        console.error("getActorsFromFavs() getArrayFromUri Error: " + code + " " + msg);
-    });
-}
-function grandparentsQuery(firstName) {
-    var el = document.getElementById('query-response');
-    el.innerHTML = "";
-    ff.getArrayFromUri("/Customers/(firstName eq '" + firstName + "')/father or mother/()/mother or father", function(arr) {
-        var str = "";
-        var elStr = "";
-        var outArray = [];
-        if(arr.length <= 0) alert("Create some Customer objects in the Customers Collection first!");
-        else {
-            var wellWrap = document.createElement("div");
-            wellWrap.className = "well blue";
-            var mediaDiv = document.createElement("div");
-            mediaDiv.className = "media";
-            var mediaBody = document.createElement("div");
-            mediaBody.className = "media-body";		 
-            var mediaHeading = document.createElement("p");
-            mediaHeading.className = "media-heading";		 
-            el.appendChild(wellWrap);
-            wellWrap.appendChild(mediaDiv);
-            for(var i = 0; i < arr.length; i++) {
-                var p = new Customer(arr[i]).printMe();
-                outArray.push(p);
-                var imgA = document.createElement("a");
-                imgA.className = "pull-left";
-                imgA.style.clear = 'both'
-                var img = document.createElement("img");
-                img.className = "media-object";
-                img.src = arrayBufferToDataUri(arr[i].picture);
-                imgA.appendChild(img); 
-                mediaDiv.appendChild(imgA);
-            }
-            str = js_beautify(JSON.stringify(outArray), {
-                indent_size: 4,
-                indent_char: '&nbsp;',
-                linefeed_char: '<br>'
-            });
-            mediaDiv.appendChild(mediaBody); 
-            mediaBody.appendChild(mediaHeading); 
-            elStr = arr.length + " Customer objects were retrieved from the Customers Collection with data: " + str;
-            mediaHeading.innerHTML = "<br><div class = 'well blue'>" + elStr + "</div>";
-        }
-    }, function(code, msg) {
-        el.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-        console.error("getActorsFromFavs() getArrayFromUri Error: " + code + " " + msg);
-    });
-}
-function cousinsQuery(firstName) {
-    var el = document.getElementById('query-response');
-    el.innerHTML = "";
-    ff.getArrayFromUri("/Customers/(firstName eq '" + firstName + "')/father or mother/()/siblings/()/BackReferences.Customers.mother or BackReferences.Customers.father", function(arr) {
-        var str = "";
-        var elStr = "";
-        var outArray = [];
-        if(arr.length <= 0) alert("Create some Customer objects in the Customers Collection first!");
-        else {
-            var wellWrap = document.createElement("div");
-            wellWrap.className = "well blue";
-            var mediaDiv = document.createElement("div");
-            mediaDiv.className = "media";
-            var mediaBody = document.createElement("div");
-            mediaBody.className = "media-body";		 
-            var mediaHeading = document.createElement("p");
-            mediaHeading.className = "media-heading";		 
-            el.appendChild(wellWrap);
-            wellWrap.appendChild(mediaDiv);
-            for(var i = 0; i < arr.length; i++) {
-                var p = new Customer(arr[i]).printMe();
-                outArray.push(p);
-                var imgA = document.createElement("a");
-                imgA.className = "pull-left";
-                imgA.style.clear = 'both'
-                var img = document.createElement("img");
-                img.className = "media-object";
-                img.src = arrayBufferToDataUri(arr[i].picture);
-                imgA.appendChild(img); 
-                mediaDiv.appendChild(imgA);
-            }
-            str = js_beautify(JSON.stringify(outArray), {
-                indent_size: 4,
-                indent_char: '&nbsp;',
-                linefeed_char: '<br>'
-            });
-            mediaDiv.appendChild(mediaBody); 
-            mediaBody.appendChild(mediaHeading); 
-            elStr = arr.length + " Customer objects were retrieved from the Customers Collection with data: " + str;
-            mediaHeading.innerHTML = "<br><div class = 'well blue'>" + elStr + "</div>";
-        }
-    }, function(code, msg) {
-        el.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-        console.error("getActorsFromFavs() getArrayFromUri Error: " + code + " " + msg);
-    });
-}
-function arrayBufferToDataUri(arrayBuffer) {
+function ArrayBufferToDataUri(arrayBuffer) {
     var base64 = '',
     encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
     bytes = new Uint8Array(arrayBuffer), byteLength = bytes.byteLength,
     byteRemainder = byteLength % 3, mainLength = byteLength - byteRemainder,
     a, b, c, d, chunk;
-    for (var i = 0; i < mainLength; i = i + 3) {
-        chunk = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2];
+    for (var i = 0; i < mainLength; i = i+3) {
+        chunk = (bytes[i] << 16) | (bytes[i+1] << 8) | bytes[i+2];
         a = (chunk & 16515072) >> 18; b = (chunk & 258048) >> 12;
         c = (chunk & 4032) >> 6; d = chunk & 63;
-        base64 += encodings[a] + encodings[b] + encodings[c] + encodings[d];
+        base64 += encodings[a]+encodings[b]+encodings[c]+encodings[d];
     }
     if (byteRemainder == 1) {
         chunk = bytes[mainLength];
         a = (chunk & 252) >> 2;
         b = (chunk & 3) << 4;
-        base64 += encodings[a] + encodings[b] + '==';
+        base64 += encodings[a]+encodings[b]+'==';
     } else if (byteRemainder == 2) {
-        chunk = (bytes[mainLength] << 8) | bytes[mainLength + 1];
+        chunk = (bytes[mainLength] << 8) | bytes[mainLength+1];
         a = (chunk & 16128) >> 8;
         b = (chunk & 1008) >> 4;
         c = (chunk & 15) << 2;
-        base64 += encodings[a] + encodings[b] + encodings[c] + '=';
+        base64 += encodings[a]+encodings[b]+encodings[c]+'=';
     }
-    return "data:image/png;base64," + base64;
+    return "data:image/png;base64,"+base64;
 }
 // Models
 function Customer(obj) {
@@ -1016,13 +513,19 @@ function Customer(obj) {
 function Product(obj) {
     this.description = null;
     this.sku = null;
+    this.model = null;
+    this.weight = null;
     this.qrcode = null;
     this.mfg = null;
+    this.image = null;
     if(obj) {
         this.description = obj.description;
         this.sku = obj.sku;
-        this.qrcode = obj.qrcode;
+        this.model = obj.model;
+        this.weight = obj.weight;
+        this.qrcode = new QRCode(obj.qrcode);
         this.mfg = new Manufacturer(obj.mfg);
+        this.image = new ProductImage(obj.image);
         this.metadata = new FFMetaData(obj);
     }
     return this;
@@ -1045,11 +548,13 @@ function Order(obj) {
     this.customer = null;
     this.vendor = null;
     this.total = null;
+    this.orderLines = null;
     this.placedAt = null;
     if(obj) {
         this.customer = new Customer(obj.customer);
         this.vendor = new Vendor(obj.vendor);
         this.total = obj.total;
+        this.orderLines = obj.orderLines;
         this.placedAt = new Address(obj.placedAt);
         this.metadata = new FFMetaData(obj);
     }
@@ -1061,7 +566,7 @@ function Vendor(obj) {
     this.address = null;
     if(obj) {
         this.name = obj.name;
-        this.logo = obj.ffUrl + "/logo";
+        this.logo = obj.ffUrl+"/logo";
         this.address = new Address(obj.address);
         this.metadata = new FFMetaData(obj);
     }
@@ -1074,7 +579,7 @@ function Manufacturer(obj) {
     if(obj) {
         this.name = obj.name;
         this.address = new Address(obj.address);
-        this.logo = obj.ffUrl + "/logo";
+        this.logo = obj.ffUrl+"/logo";
         this.metadata = new FFMetaData(obj);
     }
     return this;    
@@ -1086,12 +591,13 @@ function Price(obj) {
     if(obj) {
         this.name = obj.name;
         this.address = new Address(obj.address);
-        this.logo = obj.ffUrl + "/logo";
+        this.logo = obj.ffUrl+"/logo";
         this.metadata = new FFMetaData(obj);
     }
     return this;    
 }
 function Address(obj) {
+    this.streetNo = null;
     this.street = null;
     this.city = null;
     this.state = null;
@@ -1099,6 +605,7 @@ function Address(obj) {
     this.postCode = null;
     this.location = null;
     if(obj) {
+        this.streetNo = obj.streetNo;
         this.street = obj.street;
         this.city = obj.city;
         this.state = obj.state;
@@ -1129,11 +636,8 @@ function Account(obj) {
 }
 function ProductImage(obj) {
     this.image = null;
-    this.product = null;
-    this.metadata = null;
     if(obj) {
-        this.image = obj.ffUrl + "/image";
-        this.product = new Product(obj.product);
+        this.image = obj.ffUrl+"/image";
         this.metadata = new FFMetaData(obj);
     }
     return this;    
@@ -1142,7 +646,7 @@ function Avatar(obj) {
     this.image = null;
     this.nickname = null;
     if(obj) {
-        this.image = obj.ffUrl + "/image";
+        this.image = obj.ffUrl+"/image";
         this.nickname = obj.nickname;
         this.metadata = new FFMetaData(obj);
     }
@@ -1183,12 +687,15 @@ function Like (obj) {
 function QRCode (obj) {
     this.image = null;
     if(obj) {
-        this.image = obj.ffUrl + "/image";
+        this.image = obj.ffUrl+"/image";
         this.metadata = new FFMetaData(obj);
     }
     return this;        
 }
 // Instantiating the FatFractal instance
 var ff = new FatFractal();
+ff.setAutoLoadRefs(true);
+ff.setAutoLoadBlobs(false);
+ff.setDebug (false);
 </script>
 </html>

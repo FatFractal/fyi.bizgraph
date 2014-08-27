@@ -3,11 +3,11 @@ var common = require('scripts/common');
 
 function Customer() {
     this.clazz = "Customer";
-    this.user = new ff.FFUser();
+    this.user = null;
     this.firstName = null;
     this.lastName = null;
     this.email = null;
-    this.address = new Address();
+    this.address = null;
     this.phone = null;
     return this;
 }
@@ -16,8 +16,11 @@ function Product() {
     this.clazz = "Product";
     this.description = null;
     this.sku = null;
+    this.model = null;
+    this.weight = null;
     this.qrcode = null;
     this.mfg = null;
+    this.image = null;
     // this.vendors = [];
     // this.gallery = [];
     return this;
@@ -35,17 +38,17 @@ function OrderLine() {
 
 function Order(o) {    
     this.clazz = "Order";
-    this.vendor = new Vendor();
-    this.customer = new Customer();
+    this.vendor = null;
+    this.customer = null;
     this.total = null;
-    this.placedAt = new Address();
+    this.placedAt = null;
     return this;    
 }
 
 function Vendor () {
     this.clazz = "Vendor";
     this.name = null;
-    this.address = new Address();
+    this.address = null;
     this.logo = null;
     return this;    
 }
@@ -72,7 +75,7 @@ function Address() {
     this.state = null;
     this.country = null;
     this.postCode = null;
-    this.location = new Location();
+    this.location = null;
     return this;    
 }
 
@@ -85,14 +88,13 @@ function Location() {
 function Account() {
     this.clazz = "Account";
     this.customer = null;
-    this.paymentMethods = [];
+    this.paymentMethods = null;
     return this;    
 }
 
 function ProductImage() {
     this.clazz = "ProductImage";
     this.image = null;
-    this.product = null;
     return this;    
 }
 
@@ -161,10 +163,10 @@ exports.setUpSysAdmins = function() {
 
 exports.createSomeMfgs = function() {
     var objs = [
-    {adminEmail:"adam@zojurushi.com",name:"Zojurushi",number:"1149",street:"W 190th St #1000",city:"Gardena",state:"CA",postCode:"90248",country:"USA",logoUrl:"http://www.zojirushi.com/img/zojirushi_logo_black.jpg",logoType:"image/jpg"},
-    {adminEmail:"adam@epson.com",name:"Epson",number:"3840",street:"Kilroy Airport Way",city:"Long Beach",state:"CA",postCode:"90806",country:"USA",logoUrl:"http://www.epson.com/_assets/img/header/header-logo-tagline.png",logoType:"image/jpg"},
-    {adminEmail:"adam@shark.com",name:"Shark",number:"180",street:"Wells Avenue #200",city:"Newton",state:"MA",postCode:"02459",country:"USA",logoUrl:"http://www.sharkclean.com/include/images/layout/footer_joinUs.jpg",logoType:"image/jpg"},
-    {adminEmail:"adam@stoneline.com",name:"Stoneline",number:"16",street:"Carroll Street",city:"Dunedin",state:"",postCode:"9016",country:"NZ",logoUrl:"http://www.stoneline.co.nz/images/551/medium/logo.jpg",logoType:"image/jpg"}
+    {adminEmail:"adam@zojurushi.com",name:"Zojurushi",streetNo:"1149",street:"W 190th St #1000",city:"Gardena",state:"CA",postCode:"90248",country:"USA",logoUrl:"http://www.zojirushi.com/img/zojirushi_logo_black.jpg",logoType:"image/jpg"},
+    {adminEmail:"adam@epson.com",name:"Epson",streetNo:"3840",street:"Kilroy Airport Way",city:"Long Beach",state:"CA",postCode:"90806",country:"USA",logoUrl:"http://www.epson.com/_assets/img/header/header-logo-tagline.png",logoType:"image/jpg"},
+    {adminEmail:"adam@shark.com",name:"Shark",streetNo:"180",street:"Wells Avenue #200",city:"Newton",state:"MA",postCode:"02459",country:"USA",logoUrl:"http://www.sharkclean.com/include/images/layout/footer_joinUs.jpg",logoType:"image/jpg"},
+    {adminEmail:"adam@stoneline.com",name:"Stoneline",streetNo:"16",street:"Carroll Street",city:"Dunedin",state:"",postCode:"9016",country:"NZ",logoUrl:"http://www.stoneline.co.nz/images/551/medium/logo.jpg",logoType:"image/jpg"}
     ];
     var count = 0;
     for (var i = 0; i < objs.length; i++) {
@@ -180,7 +182,7 @@ exports.createSomeMfgs = function() {
         var test = ff.getObjFromUri("/Manufacturers/" + objs[i].name);
         if(!test) {
             var ad = new Address();
-            ad.number = objs[i].number;
+            ad.streetNo = objs[i].streetNo;
             ad.street = objs[i].street;
             ad.city = objs[i].city;
             ad.state = objs[i].state;
@@ -209,9 +211,9 @@ exports.createSomeMfgs = function() {
 
 exports.createSomeVendors = function() {
     var objs = [
-    {adminEmail:"adam@amazon.com",name:"Amazon",number:"1200",street:"12th Ave. South, Ste. 1200",city:"Seattle",state:"WA",postCode:"98144-2734",country:"USA",logoUrl:"http://phandroid.s3.amazonaws.com/wp-content/uploads/2010/09/amazon-logo-1.jpg",logoType:"image/jpg"},
-    // {name:"IBM",number:"1",street:"New Orchard Road",city:"Armonk",state:"NY",postCode:"10504-1722",country:"USA",logoUrl:"http://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/1000px-IBM_logo.svg.png",logoType:"image/png"},
-    {adminEmail:"adam@bestbuy.com",name:"BestBuy",number:"7601",street:"Penn Avenue South",city:"Richfield",state:"MN",postCode:"55423",country:"USA",logoUrl:"http://img.bbystatic.com/BestBuy_US//en_US/images/global/header/logo.png",logoType:"image/png"}
+    {adminEmail:"adam@amazon.com",name:"Amazon",streetNo:"1200",street:"12th Ave. South, Ste. 1200",city:"Seattle",state:"WA",postCode:"98144-2734",country:"USA",logoUrl:"http://phandroid.s3.amazonaws.com/wp-content/uploads/2010/09/amazon-logo-1.jpg",logoType:"image/jpg"},
+    // {name:"IBM",streetNo:"1",street:"New Orchard Road",city:"Armonk",state:"NY",postCode:"10504-1722",country:"USA",logoUrl:"http://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/1000px-IBM_logo.svg.png",logoType:"image/png"},
+    {adminEmail:"adam@bestbuy.com",name:"BestBuy",streetNo:"7601",street:"Penn Avenue South",city:"Richfield",state:"MN",postCode:"55423",country:"USA",logoUrl:"http://img.bbystatic.com/BestBuy_US//en_US/images/global/header/logo.png",logoType:"image/png"}
     ];
     var count = 0;
     for (var i = 0; i < objs.length; i++) {
@@ -227,7 +229,7 @@ exports.createSomeVendors = function() {
         var test = ff.getObjFromUri("/Manufacturers/" + objs[i].name);
         if(!test) {
             var ad = new Address();
-            ad.number = objs[i].number;
+            ad.streetNo = objs[i].streetNo;
             ad.street = objs[i].street;
             ad.city = objs[i].city;
             ad.state = objs[i].state;
@@ -315,23 +317,23 @@ exports.createSomeProducts = function() {
             if(common.debug) print("models.js.createSomeProducts Manufacturer admins "+JSON.stringify(admins));
             var admin = admins[0];
             if(mfg) {
+                var img = common.getThumb(objs[i].picture, objs[i].type);
+                var pimg = new ProductImage();
+                pimg = ff.createObjAtUri(pimg, "/ProductImages", admin.guid);
+                count ++;
+                ff.saveBlob(pimg, 'image', img, objs[i].type);
+                if(common.debug) print("models.js.createSomeProducts created ProductImage " + pimg.guid);                
                 var obj = new Product();
                 obj.guid = objs[i].sku;
                 obj.sku = objs[i].sku;
                 obj.description = objs[i].description;
                 obj.model = objs[i].model;
                 obj.weight = objs[i].weight;                
+                ff.addReferenceToObj(pimg.ffUrl, "image", obj);
                 ff.addReferenceToObj(mfg.ffUrl, "mfg", obj);
                 obj = ff.createObjAtUri(obj, "/Products", admin.guid);
                 count ++;
-                if(common.debug) print("models.js.createSomeProducts created Product " + obj.guid);                
-                var img = common.getThumb(objs[i].picture, objs[i].type);
-                var pimg = new ProductImage();
-                ff.addReferenceToObj(obj.ffUrl, "product", pimg);
-                pimg = ff.createObjAtUri(pimg, "/ProductImages", admin.guid);
-                count ++;
-                ff.saveBlob(pimg, 'image', img, objs[i].type);
-                      
+                if(common.debug) print("models.js.createSomeProducts created Product " + obj.guid);
             } else {
                 if(common.debug) print("models.js.createSomeProducts could not find Manufacturer " + mfg + ", skipping add product");
             }
@@ -342,12 +344,12 @@ exports.createSomeProducts = function() {
 
 exports.createSomeCustomers = function() {
     var objs = [
-    {firstName:"Kevin",lastName:"Nickels",email:"nickelskevin@gmail.com",phone:"+1-650-318-3887",password:"asdf",number:"3420",street:"Finnian Way #410",city:"Dublin",state:"CA",postCode:"94568",country:"USA"},
-    {firstName:"Gary",lastName:"Casey",email:"gary.casey@gmail.com",phone:"+44-7974-457003",password:"asdf",number:"Clifton House",street:"Viewfield Street",city:"Nairn",state:"Scotland",postCode:"IV124HW",country:"UK"},
-    {firstName:"Faisal",lastName:"Hakeem",email:"faisal.7akeem@gmail.com",phone:"+1-408-455-4435",password:"asdf",number:"350",street:"River Oaks Parkway, Apt 1234",city:"San Jose",state:"CA",postCode:"95134",country:"USA"},
-    {firstName:"Mavis",lastName:"Nickels",email:"mavis_2@q.com",phone:"+1-360-573-9785",password:"asdf",number:"16323",street:"NE 94th Avenue",city:"Battleground",state:"WA",postCode:"98604",country:"USA"},
-    {firstName:"Vanessa",lastName:"Schott",email:"vanessa@spotjournal.me",phone:"+1-415-746-0165",password:"asdf",number:"350",street:"River Oaks Parkway, Apt 1234",city:"San Jose",state:"CA",postCode:"95134",country:"USA"},
-    {firstName:"Dave",lastName:"Wells",email:"shawkinaw@gmail.com",phone:"+1-217-714-6872",password:"asdf",number:"4621",street:"Copper Ridge",city:"Champaign",state:"IL",postCode:"61822",country:"USA"},
+    {firstName:"Kevin",lastName:"Nickels",email:"nickelskevin@gmail.com",phone:"+1-650-318-3887",password:"asdf",streetNo:"3420",street:"Finnian Way #410",city:"Dublin",state:"CA",postCode:"94568",country:"USA"},
+    {firstName:"Gary",lastName:"Casey",email:"gary.casey@gmail.com",phone:"+44-7974-457003",password:"asdf",streetNo:"Clifton House",street:"Viewfield Street",city:"Nairn",state:"Scotland",postCode:"IV124HW",country:"UK"},
+    {firstName:"Faisal",lastName:"Hakeem",email:"faisal.7akeem@gmail.com",phone:"+1-408-455-4435",password:"asdf",streetNo:"350",street:"River Oaks Parkway, Apt 1234",city:"San Jose",state:"CA",postCode:"95134",country:"USA"},
+    {firstName:"Mavis",lastName:"Nickels",email:"mavis_2@q.com",phone:"+1-360-573-9785",password:"asdf",streetNo:"16323",street:"NE 94th Avenue",city:"Battleground",state:"WA",postCode:"98604",country:"USA"},
+    {firstName:"Vanessa",lastName:"Schott",email:"vanessa@spotjournal.me",phone:"+1-415-746-0165",password:"asdf",streetNo:"350",street:"River Oaks Parkway, Apt 1234",city:"San Jose",state:"CA",postCode:"95134",country:"USA"},
+    {firstName:"Dave",lastName:"Wells",email:"shawkinaw@gmail.com",phone:"+1-217-714-6872",password:"asdf",streetNo:"4621",street:"Copper Ridge",city:"Champaign",state:"IL",postCode:"61822",country:"USA"},
     ];
     var count = 0;
     for (var i = 0; i < objs.length; i++) {
@@ -372,7 +374,7 @@ exports.createSomeCustomers = function() {
             cus.email = objs[i].email;
             // create the address
             var ad = new Address();
-            ad.number = objs[i].number;
+            ad.streetNo = objs[i].streetNo;
             ad.street = objs[i].street;
             ad.city = objs[i].city;
             ad.state = objs[i].state;
@@ -393,15 +395,15 @@ exports.createSomeCustomers = function() {
 
 exports.createSomeAddresses = function() {
     var objs = [
-    {number:"376",street:"University Ave",city:"Palo Alto",state:"CA",postCode:"94301",country:"USA"},
-    {number:"714",street:"7th Ave",city:"New York",state:"NY",postCode:"10036",country:"USA"},
-    {number:"4550",street:"Worth St",city:"Dallas",state:"TX",postCode:"75246",country:"USA"},
-    {number:"530",street:"E McDowell Rd",city:"Phoenix",state:"AZ",postCode:"85003",country:"USA"},
-    {number:"1",street:"W Rivercenter Blvd",city:"Covington",state:"KY",postCode:"41011",country:"USA"},
-    {number:"127",street:"Ranch Dr",city:"Milpitas",state:"CA",postCode:"95035",country:"USA"},
-    {number:"401",street:"Biscayne Blvd #8323",city:"Miami",state:"FL",postCode:"33132",country:"USA"},
-    {number:"4",street:"Limmatquai",city:"Zürich",state:"",postCode:"",country:"Zürich"},
-    {number:"801",street:"Alaskan Way",city:"Seattle",state:"WA",postCode:"98104",country:"USA"}
+    {streetNo:"376",street:"University Ave",city:"Palo Alto",state:"CA",postCode:"94301",country:"USA"},
+    {streetNo:"714",street:"7th Ave",city:"New York",state:"NY",postCode:"10036",country:"USA"},
+    {streetNo:"4550",street:"Worth St",city:"Dallas",state:"TX",postCode:"75246",country:"USA"},
+    {streetNo:"530",street:"E McDowell Rd",city:"Phoenix",state:"AZ",postCode:"85003",country:"USA"},
+    {streetNo:"1",street:"W Rivercenter Blvd",city:"Covington",state:"KY",postCode:"41011",country:"USA"},
+    {streetNo:"127",street:"Ranch Dr",city:"Milpitas",state:"CA",postCode:"95035",country:"USA"},
+    {streetNo:"401",street:"Biscayne Blvd #8323",city:"Miami",state:"FL",postCode:"33132",country:"USA"},
+    {streetNo:"4",street:"Limmatquai",city:"Zürich",state:"",postCode:"",country:"Zürich"},
+    {streetNo:"801",street:"Alaskan Way",city:"Seattle",state:"WA",postCode:"98104",country:"USA"}
     ];
     var count = 0;
     for (var i = 0; i < objs.length; i++) {
@@ -410,7 +412,7 @@ exports.createSomeAddresses = function() {
         var user = ff.getReferredObject("user", customer);
         // create the address
         var ad = new Address();
-        ad.number = objs[i].number;
+        ad.streetNo = objs[i].streetNo;
         ad.street = objs[i].street;
         ad.city = objs[i].city;
         ad.state = objs[i].state;
@@ -432,7 +434,7 @@ exports.createSomeOrders = function() {
         if(common.debug) print("models.js.createSomeOrders retrieved Customer " + JSON.stringify(customer));
         var address = ff.getObjFromUri("/Addresses/(guid eq random(guid))");
         if(!address) {
-            var ad = {clazz:"Address",number:"123",street:"Main Street",city:"Anytown",state:"OH",postCode:"23456",country:"USA"};
+            var ad = {clazz:"Address",streetNo:"123",street:"Main Street",city:"Anytown",state:"OH",postCode:"23456",country:"USA"};
             address = ff.createObjAtUri(ad, "/Addresses", user.guid);
         }
         if(common.debug) print("models.js.createSomeOrders retrieved Address " + JSON.stringify(address));
@@ -463,15 +465,16 @@ exports.createSomeOrders = function() {
                 var line = new OrderLine();
                 line.price = price.price;
                 line.quantity = qty;
-                line.total = qty * price.price;
+                line.total = common.round(qty * price.price, 2);
                 ff.addReferenceToObj(prod.ffUrl, "product", line);            
                 ff.addReferenceToObj(order.ffUrl, "order", line);
                 line = ff.createObjAtUri(line, "/OrderLines", user.guid);
                 if(common.debug) print("models.js.createSomeOrders created OrderLine " + JSON.stringify(line));
-                // ff.grabBagAdd(line.ffUrl, order.ffUrl, "orderLines", user.guid);
+                ff.grabBagAdd(line.ffUrl, order.ffUrl, "orderLines", user.guid);
                 count ++;               
             }
         }
     }
     return count;  
 }
+
