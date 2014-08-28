@@ -203,7 +203,15 @@ exports.createSomeMfgs = function() {
             count ++;
             var img = common.getThumb(objs[i].logoUrl, objs[i].logoType);
             if(common.debug) print("models.js.createSomeMfgs created Manufacturer " + obj.guid);
-            ff.saveBlob(obj, 'logo', img, objs[i].logoType);        
+            if (img) {
+                try {
+                    ff.saveBlob(obj, 'logo', img, objs[i].logoType);
+                } catch (whatever) {
+                    ff.logger.error("Failed to saveBlob even though an img was created - exception is " + whatever);
+                }
+            } else {
+                ff.logger.forceWarn("Failed to create image for manufacturer " + obj.guid);
+            }
         }
     }
     return count;  
