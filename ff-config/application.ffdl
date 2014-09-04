@@ -133,3 +133,5 @@ CREATE HANDLER grantAccessToVendor PRE ON /Orders CREATE AS javascript:require('
 CREATE EXTENSION /populate UNSECURED AS javascript:require('scripts/extensions').populate();
 CREATE EXTENSION /cleanup UNSECURED AS javascript:require('scripts/extensions').cleanup();
 CREATE EXTENSION /createSomeOrders UNSECURED AS javascript:require('scripts/extensions').createSomeOrders();
+CREATE EXTENSION /getGraph UNSECURED AS javascript:require('scripts/graph').getGraph();
+
