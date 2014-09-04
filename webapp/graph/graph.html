@@ -1,0 +1,103 @@
+<html>
+<head>
+    <script type="text/javascript">
+        function httpsRedirect() {
+            var httpURL = window.location.hostname + window.location.pathname;
+            var httpsURL = "https://" + httpURL;
+            window.location = httpsURL;
+        }
+        console.log(window.location.href);
+        if (!window.location.href.match('^https://') && !window.location.href.match('^http://localhost'))
+            httpsRedirect();
+    </script>
+    <script type="text/javascript" src="//www.fatfractal.com/prod/js/FatFractal.latest.js"></script>
+    <link rel="stylesheet" href="demo.css">
+    <script src="d3.v3.min.js" charset="utf-8"></script>
+    <script src="dagre-d3.js"></script>
+
+</head>
+<style id="css">
+    text {
+        font-weight: 300;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+        font-size: 14px;
+    }
+
+    .node rect {
+        stroke: #333;
+        fill: #fff;
+    }
+
+    .edgePath path {
+        stroke: #333;
+        fill: none;
+    }
+</style>
+
+<body>
+
+<h1 id="baseurl"></h1>
+
+</body>
+
+<svg width=1200 height=800></svg>
+
+<script id="js">
+    function randomIntFromInterval(min,max)
+    {
+        return Math.floor(Math.random()*(max-min+1)+min);
+    }
+
+    var users = [
+        {userName: 'nickelskevin@gmail.com', role:'Customer'}
+        ,{userName: 'adam@bestbuy.com', role:'Vendor'}
+        ,{userName: 'adam@zojurushi.com', role:'Manufacturer'}
+        ,{userName: 'adam@bizgraph.com', role:'SysAdmin'}
+    ];
+    var dagreD3 = dagreD3;
+    var ff = new FatFractal();
+    var user = users[randomIntFromInterval(0, users.length-1)];
+    ff.login(user.userName, 'asdf', function() {
+        var baseEl = document.getElementById('baseurl');
+        baseEl.innerHTML = "Logged in as " + user.role + ", " + user.userName;
+        ff.getObjFromExtension("/getGraph?query=/Orders?sort=createdAt desc&count=1&start=0&depthRef=10&depthGb=1", function (ffGraph) {
+            // Create a graph from the JSON
+            var g = dagreD3.json.decode(ffGraph.nodes, ffGraph.edges);
+
+            // Create the renderer
+            var renderer = new dagreD3.Renderer();
+
+            // Set up an SVG group so that we can translate the final graph.
+            var svg = d3.select('svg'),
+                    svgGroup = svg.append('g');
+
+            // Set initial zoom to 100%
+            var initialScale = 1.00;
+            var oldZoom = renderer.zoom();
+            renderer.zoom(function (graph, svg) {
+                var zoom = oldZoom(graph, svg);
+
+                // We must set the zoom and then trigger the zoom event to synchronize
+                // D3 and the DOM.
+                zoom.scale(initialScale).event(svg);
+                return zoom;
+            });
+
+            // Run the renderer. This is what draws the final graph.
+            var layout = renderer.run(g, svgGroup);
+
+            // Center the graph
+            var xCenterOffset = (svg.attr('width') - layout.graph().width * initialScale) / 2;
+            svgGroup.attr('transform', 'translate(' + xCenterOffset + ', 20)');
+            svg.attr('height', layout.graph().height * initialScale + 40);
+        }, function () {
+            alert('Error');
+        });
+    }, function() {
+        var baseEl = document.getElementById('baseurl');
+        baseEl.innerHTML = "FAILED to login as " + user.role + ", " + user.userName;
+    });
+</script>
+
+</html>
+
