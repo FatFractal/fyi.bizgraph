@@ -220,7 +220,7 @@ exports.createSomeMfgs = function() {
 exports.createSomeVendors = function() {
     var objs = [
     {adminEmail:"adam@amazon.com",name:"Amazon",streetNo:"1200",street:"12th Ave. South, Ste. 1200",city:"Seattle",state:"WA",postCode:"98144-2734",country:"USA",logoUrl:"http://phandroid.s3.amazonaws.com/wp-content/uploads/2010/09/amazon-logo-1.jpg",logoType:"image/jpg"},
-    // {name:"IBM",streetNo:"1",street:"New Orchard Road",city:"Armonk",state:"NY",postCode:"10504-1722",country:"USA",logoUrl:"http://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/1000px-IBM_logo.svg.png",logoType:"image/png"},
+    // {adminEmail:"adam@ibm.com",name:"IBM",streetNo:"1",street:"New Orchard Road",city:"Armonk",state:"NY",postCode:"10504-1722",country:"USA",logoUrl:"http://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/1000px-IBM_logo.svg.png",logoType:"image/png"},
     {adminEmail:"adam@bestbuy.com",name:"BestBuy",streetNo:"7601",street:"Penn Avenue South",city:"Richfield",state:"MN",postCode:"55423",country:"USA",logoUrl:"http://img.bbystatic.com/BestBuy_US//en_US/images/global/header/logo.png",logoType:"image/png"}
     ];
     var count = 0;
@@ -446,7 +446,7 @@ exports.createSomeOrders = function() {
             address = ff.createObjAtUri(ad, "/Addresses", user.guid);
         }
         if(common.debug) print("models.js.createSomeOrders retrieved Address " + JSON.stringify(address));
-        var numOrders = Math.floor(Math.random() * 10) + 1;
+        var numOrders = Math.floor(Math.random() * 5) + 1;
         if(common.debug) print("models.js.createSomeOrders will create "+numOrders+" Orders");
         for (var i = 0; i < numOrders; i++) {
             // get a random Vendor
@@ -459,7 +459,7 @@ exports.createSomeOrders = function() {
             order = ff.createObjAtUri(order, "/Orders", user.guid);
             count ++;               
             if(common.debug) print("models.js.createSomeOrders created Order " + JSON.stringify(order));
-            var numOrderLines = Math.floor(Math.random() * 10) + 1;
+            var numOrderLines = Math.floor(Math.random() * 3) + 1;
             if(common.debug) print("models.js.createSomeOrders will create "+numOrderLines+" OrderLines");
             for (var j = 0; j < numOrderLines; j++) {
                 var qty = Math.floor(Math.random() * 10) + 1;

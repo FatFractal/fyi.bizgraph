@@ -44,15 +44,20 @@ DROP OBJECTTYPE Address
 CREATE OBJECTTYPE Address (streetNo STRING, street STRING, city STRING, state STRING, country STRING, postCode STRING, location REFERENCE /Locations)
 DROP OBJECTTYPE Location
 CREATE OBJECTTYPE Location (geo GEOLOCATION)
-CREATE OBJECTTYPE Account (customer REFERENCE /Customers, paymentMethods GRABBAG /PaymentMethods)
-CREATE OBJECTTYPE PaymentMethod (type STRING, accountNumber ENCRYPTED STRING, nickname ENCRYPTED STRING, expireMonth NUMERIC, expireYear NUMERIC, cvv NUMERIC)
-DROP OBJECTTYPE ProductImage
-CREATE OBJECTTYPE ProductImage (image BYTEARRAY)
-CREATE OBJECTTYPE Avatar (image BYTEARRAY, nickname STRING)
-CREATE OBJECTTYPE Rating (rating STRING, relatesTo REFERENCE, geo REFERENCE /Locations)
-CREATE OBJECTTYPE Comment (comment STRING, relatesTo REFERENCE, geo REFERENCE /Locations)
-CREATE OBJECTTYPE Like (like BOOLEAN, relatesTo REFERENCE, geo REFERENCE /Locations)
 CREATE OBJECTTYPE QRCode (image BYTEARRAY)
+CREATE OBJECTTYPE ProductImage (image BYTEARRAY)
+DROP OBJECTTYPE Account
+#CREATE OBJECTTYPE Account (customer REFERENCE /Customers, paymentMethods GRABBAG /PaymentMethods)
+DROP OBJECTTYPE PaymentMethod
+#CREATE OBJECTTYPE PaymentMethod (type STRING, accountNumber ENCRYPTED STRING, nickname ENCRYPTED STRING, expireMonth NUMERIC, expireYear NUMERIC, cvv NUMERIC)
+DROP OBJECTTYPE Avatar
+#CREATE OBJECTTYPE Avatar (image BYTEARRAY, nickname STRING)
+DROP OBJECTTYPE Rating
+#CREATE OBJECTTYPE Rating (rating STRING, relatesTo REFERENCE, geo REFERENCE /Locations)
+DROP OBJECTTYPE Comment
+#CREATE OBJECTTYPE Comment (comment STRING, relatesTo REFERENCE, geo REFERENCE /Locations)
+DROP OBJECTTYPE Like
+#CREATE OBJECTTYPE Like (like BOOLEAN, relatesTo REFERENCE, geo REFERENCE /Locations)
 #
 # Collection Resources
 #
@@ -78,7 +83,7 @@ PERMIT read:public write:system.sysadmins,object.vendor.admins ON /Prices
 CREATE VIRTUAL_COLLECTION /Locations as javascript:require('scripts/Location')
 
 CREATE COLLECTION /OrderLines OBJECTTYPE OrderLine
-PERMIT read:none write:object.order.vendor.admins,system.sysadmins ON /OrderLines
+PERMIT read:object.product.mfg.admins write:object.order.vendor.admins,system.sysadmins ON /OrderLines
 
 CREATE COLLECTION /Orders OBJECTTYPE Order
 PERMIT read:none write:object.vendor.admins,system.sysadmins ON /Orders
@@ -92,30 +97,38 @@ PERMIT read:public write:system.sysadmins,object.admins ON /Manufacturers
 CREATE COLLECTION /Addresses OBJECTTYPE Address
 PERMIT read:public write:system.sysadmins ON /Addresses
 
-CREATE COLLECTION /Accounts OBJECTTYPE Account
-PERMIT read:none write:system.sysadmins ON /Accounts
-
-CREATE COLLECTION /PaymentMethods OBJECTTYPE PaymentMethod
-PERMIT read:none write:system.sysadmins ON /PaymentMethods
+CREATE COLLECTION /QRCodes OBJECTTYPE QRCode
+PERMIT read:public write:system.sysadmins ON /QRCodes
 
 CREATE COLLECTION /ProductImages OBJECTTYPE ProductImage
 #PERMIT create:object.mfg.admins write:system.sysadmins,object.mfg.admins ON /ProductImages
 PERMIT read:public write:system.sysadmins,object.mfg.admins ON /ProductImages
 
-CREATE COLLECTION /Ratings OBJECTTYPE Rating
-PERMIT read:public write:system.sysadmins ON /Ratings
+DROP COLLECTION COMPLETELY /Accounts
+#CREATE COLLECTION /Accounts OBJECTTYPE Account
+#PERMIT read:none write:system.sysadmins ON /Accounts
 
-CREATE COLLECTION /Comments OBJECTTYPE Comment
-PERMIT read:public write:system.sysadmins ON /Comments
+DROP COLLECTION COMPLETELY /PaymentMethods
+#CREATE COLLECTION /PaymentMethods OBJECTTYPE PaymentMethod
+#PERMIT read:none write:system.sysadmins ON /PaymentMethods
 
-CREATE COLLECTION /Likes OBJECTTYPE Like
-PERMIT read:public write:system.sysadmins ON /Likes
+DROP COLLECTION COMPLETELY /Ratings
+#CREATE COLLECTION /Ratings OBJECTTYPE Rating
+#PERMIT read:public write:system.sysadmins ON /Ratings
 
-CREATE COLLECTION /Favorites OBJECTTYPE Vendor, Comment, Product
-PERMIT read:loggedin write:system.sysadmins ON /Favorites
+DROP COLLECTION COMPLETELY /Comments
+#CREATE COLLECTION /Comments OBJECTTYPE Comment
+#PERMIT read:public write:system.sysadmins ON /Comments
 
-CREATE COLLECTION /QRCodes OBJECTTYPE QRCode
-PERMIT read:public write:system.sysadmins ON /QRCodes
+DROP COLLECTION COMPLETELY /Likes
+#CREATE COLLECTION /Likes OBJECTTYPE Like
+#PERMIT read:public write:system.sysadmins ON /Likes
+
+DROP COLLECTION COMPLETELY /Favorites
+#CREATE COLLECTION /Favorites OBJECTTYPE Vendor, Comment, Product
+#PERMIT read:loggedin write:system.sysadmins ON /Favorites
+
+DROP COLLECTION COMPLETELY /Avatars
 
 #
 # Event Handlers

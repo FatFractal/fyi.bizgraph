@@ -28,6 +28,9 @@
     <script src="js/utils.js"></script>
     <!-- JSON formatter -->
     <script src="js/beautify.js"></script>
+    <!-- Graph js -->
+    <script src="graph/d3.v3.min.js"></script>  
+    <script src="//cpettitt.github.io/project/dagre-d3/v0.2.9/dagre-d3.min.js"></script>
 </head>
 <!--
 <body onunload="cleanUp()">
@@ -67,27 +70,53 @@
         <div class="well" id = "ffdl-section">
             <h2>FFDL</h2>
             <p>This test application includes the following ffdl definition for Customers, Addresses and Locations.<br></p>	
-            <div class="well">
-                CREATE OBJECTTYPE Customer (user REFERENCE /FFUser, firstName STRING, lastName STRING, email STRING, address REFERENCE /Addresses, phone STRING, vendorAccess REFERENCE /FFUserGroup)<br>
-                CREATE OBJECTTYPE Address (streetNo STRING, street STRING, city STRING, state STRING, country STRING, postCode STRING, location REFERENCE /Locations)<br>
-                CREATE OBJECTTYPE Location (geo GEOLOCATION)<br>
-                CREATE COLLECTION /Customers OBJECTTYPE Customer<br>
-                CREATE COLLECTION /Addresses OBJECTTYPE Address<br>
-                CREATE COLLECTION /Locations OBJECTTYPE Location<br>
-            </div>
-        </div>
-        <div class="well" id = "customer-graph-section">
-            <h2>The Customer Graph</h2>
-            <p>This example shows the graph response for a random Customer object. Note that the Customer object has embedded FFUser and Address objects and the Address object has an embedded Location object.</p>
-            <button id="customer-graph-button" class="btn" onclick="GetRandomCustomerGraph()">Try it!</button><br><br>
-            <ul class="nav nav-tabs" role="tablist" id = "customer-graph-tabs">
-                <li class="active"><a href="#customer-graph-request" role="tab" data-toggle="tab">Request</a></li>
-                <li><a href="#customer-graph-models" role="tab" data-toggle="tab">Models</a></li>
-                <li><a href="#customer-graph-response" role="tab" data-toggle="tab">Response</a></li>
+            <button id="customer-button" class="btn" onclick="GetFFDL()">Try it!</button><br><br>
+            <ul class="nav nav-tabs" role="tablist" id = "ffdl-tabs">
+                <li class="active"><a href="#ffdl-request" role="tab" data-toggle="tab">Request</a></li>
+                <li><a href="#ffdl-models" role="tab" data-toggle="tab">Models</a></li>
+                <li><a href="#ffdl-response-json" role="tab" data-toggle="tab">JSON</a></li>
+                <li><a href="#ffdl-response-graph" role="tab" data-toggle="tab" id="ffdl-response-graph-href">Object Graph</a></li>
             </ul>
             <!-- Tab panes -->
             <div class="tab-content">
-                <div class="tab-pane active" id="customer-graph-request">
+                <div class="tab-pane active" id="customer-request">
+                    <h3>The SDK request looks like this:</h3>
+                    <div class="well">
+                        <p>var ffdlJSON;<br>
+                            ff.getFFDL(function(obj) {<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;ffdlJSON = obj;<br>
+                            });<br>
+                        </p>
+                    </div>
+                </div>
+                <div class="tab-pane" id="ffdl-models">
+                    <h3>The client models used with this example are:</h3>
+                    <div class="well">
+                        CREATE OBJECTTYPE Customer (user REFERENCE /FFUser, firstName STRING, lastName STRING, email STRING, address REFERENCE /Addresses, phone STRING, vendorAccess REFERENCE /FFUserGroup)<br>
+                        CREATE OBJECTTYPE Address (streetNo STRING, street STRING, city STRING, state STRING, country STRING, postCode STRING, location REFERENCE /Locations)<br>
+                        CREATE OBJECTTYPE Location (geo GEOLOCATION)<br>
+                        CREATE COLLECTION /Customers OBJECTTYPE Customer<br>
+                        CREATE COLLECTION /Addresses OBJECTTYPE Address<br>
+                        CREATE COLLECTION /Locations OBJECTTYPE Location<br>
+                    </div>
+                </div>
+                <div class="tab-pane" id="ffdl-response-json">...</div>
+                <div class="tab-pane" id="ffdl-response-graph"></div>
+            </div>
+        </div>
+        <div class="well" id = "customer-section">
+            <h2>The Customer Graph</h2>
+            <p>This example shows the graph response for a random Customer object. Note that the Customer object has embedded FFUser and Address objects and the Address object has an embedded Location object.</p>
+            <button id="customer-button" class="btn" onclick="GetRandomCustomer()">Try it!</button><br><br>
+            <ul class="nav nav-tabs" role="tablist" id = "customer-tabs">
+                <li class="active"><a href="#customer-request" role="tab" data-toggle="tab">Request</a></li>
+                <li><a href="#customer-models" role="tab" data-toggle="tab">Models</a></li>
+                <li><a href="#customer-response-customer" role="tab" data-toggle="tab">JSON</a></li>
+                <li><a href="#customer-response-graph" role="tab" data-toggle="tab" id="customer-response-graph-href">Object Graph</a></li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane active" id="customer-request">
                     <h3>The SDK request looks like this:</h3>
                     <div class="well">
                         <p>var customer;<br>
@@ -97,7 +126,7 @@
                         </p>
                     </div>
                 </div>
-                <div class="tab-pane" id="customer-graph-models">
+                <div class="tab-pane" id="customer-models">
                     <h3>The client models used with this example are:</h3>
                     <div class="well">
                         <p>function Customer(obj) {<br>
@@ -128,7 +157,8 @@
                         }</p>
                     </div>
                 </div>
-                <div class="tab-pane" id="customer-graph-response">...</div>
+                <div class="tab-pane" id="customer-response-customer">...</div>
+                <div class="tab-pane" id="customer-response-graph"></div>
             </div>
         </div>
         <div class="well" id = "orders-permissions-section">
@@ -143,6 +173,7 @@
                 <li><a href="#orders-permissions-models" role="tab" data-toggle="tab">Models</a></li>
                 <li><a href="#orders-permissions-response-orders" role="tab" data-toggle="tab">Orders</a></li>
                 <li><a href="#orders-permissions-response-json" role="tab" data-toggle="tab">JSON Response</a></li>
+                <li><a href="#orders-permissions-response-graph" role="tab" data-toggle="tab" id="orders-permissions-response-href">Object Graph</a></li>
             </ul>
             <!-- Tab panes -->
             <div class="tab-content">
@@ -161,7 +192,7 @@
                     <div class="well">
                         <p>function Order(obj) {<br>
                             &nbsp;&nbsp;&nbsp;&nbsp;this.customer = new Customer();<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;this.cendor = new Vendor();<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.vendor = new Vendor();<br>
                             &nbsp;&nbsp;&nbsp;&nbsp;this.total = obj.total;<br>
                             &nbsp;&nbsp;&nbsp;&nbsp;this.placedAt = New Address(obj.placedAt);<br>
                         }</p>
@@ -193,22 +224,75 @@
                 </div>
                 <div class="tab-pane" id="orders-permissions-response-orders">...</div>
                 <div class="tab-pane" id="orders-permissions-response-json">...</div>
+                <div class="tab-pane" id="orders-permissions-response-graph"></div>
             </div>
         </div>
         <div class="well" id = "backreference-section">
             <h2>Back References</h2>
-            <p>This test will show you how to retrieve objects using Back References. There are three tests here - the first gets all backreferences to "homer". The second gets all the Customer objects from the Grab Back that reference homer by the "siblings" Reference member. The third gets all the Customer objects that refer to homer by the "father" Reference member.</p>
-            <div class="well">
-                <p>var homer, allBackRefs;<br>
-                    ff.grabBagGetAll(homer, "BackReferences", function(response) {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;allBackRefs = response;<br>
-                    });<br>
-                </p>
+            <p>This test will show you how to retrieve objects using Back References. Let's say you are the product manager for the manufacturer Zojirushi and are interested to see all cases where your product with sku B00BSEYJ3Q has been ordered. You will also note that the Stoneline admin is not permitted to see these orderlines.</p>
+            <button id="orderlines-backreference-mfg-button" class="btn" onclick="GetOrderLinesForProduct('adam@zojurushi.com','asdf', 'B00BSEYJ3Q')">Zojirushi Admin</button>
+            <button id="orderlines-backreference-mfg-button" class="btn" onclick="GetOrderLinesForProduct('adam@epson.com','asdf', 'B00BSEYJ3Q')">Stoneline Admin</button>        
+            <ul class="nav nav-tabs" role="tablist" id = "orderlines-backreference-tabs">
+                <li class="active"><a href="#orderlines-backreference-request" role="tab" data-toggle="tab">Request</a></li>
+                <li><a href="#orderlines-backreference-models" role="tab" data-toggle="tab">Models</a></li>
+                <li><a href="#orderlines-backreference-response-orderlines" role="tab" data-toggle="tab">OrderLines</a></li>
+                <li><a href="#orderlines-backreference-response-json" role="tab" data-toggle="tab">JSON Response</a></li>
+                <li><a href="#orderlines-backreference-response-graph" role="tab" data-toggle="tab" id="orderlines-backreference-response-href">Graph Response</a></li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane active" id="orderlines-backreference-request">
+                    <h3>The SDK request looks like this:</h3>
+                    <div class="well">
+                        <p>// Assuming Product object with guid B00BSEYJ3Q<br>
+                            var orderLinesArray;<br>
+                            ff.getArrayFromUri("/Products/B00BSEYJ3Q/BackReferences.OrderLines.product", function(retData) {<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;orderLinesArray = retData;<br>
+                            });<br>
+                        </p>
+                    </div>
+                </div>
+                <div class="tab-pane" id="orderlines-backreference-models">
+                    <h3>The client models used with this example are:</h3>
+                    <div class="well">
+                        <p>function Order(obj) {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.customer = new Customer();<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.vendor = new Vendor();<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.total = obj.total;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.placedAt = New Address(obj.placedAt);<br>
+                        }</p>
+                        <p>function Customer(obj) {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.user = new FFUser();<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.firstName = obj.firstName;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.lastName = obj.lastName;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.email = obj.email;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.phone = obj.phone;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.address = new Address(obj.address);<br>
+                        }</p>
+                        <p>function Vendor(obj) {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.name = obj.name;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.address = new Address(obj.address);<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.logo = obj.logo;<br>
+                        }</p>
+                        <p>function Address(obj) {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.street = obj.street<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.city = obj.city;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.state = obj.state;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.country = obj.country;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.postCode = obj.postCode;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.location = new Location(obj.location);<br>
+                        }</p>
+                        <p>function Location(obj) {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;this.geo = obj.geo<br>
+                        }</p>
+                    </div>
+                </div>
+                <div class="tab-pane" id="orderlines-backreference-response-orderlines">...</div>
+                <div class="tab-pane" id="orderlines-backreference-response-json">...</div>
+                <div class="tab-pane" id="orderlines-backreference-response-graph"></div>
             </div>
-            <button id="all-backreference-button" class="btn" onclick="getAllBackReferences('Homer')">Get all Backreferences!</button>
-            <br>
-            <p id = "backreference-response"></p>
         </div>
+        <!--
         <div class="well" id = "query-section">
             <h2>Queries</h2>
             <p>This test will show you how to retrieve objects using various queries. There are five examples in this section. The first example will get all the Customer objects that have a "father" Reference member (Note that the returned values are deduplicated). The second is basically the same, but uses the "mother" Reference member. The third example shows the use of a logical OR to get all of Bart's granparents. The fourth example is similar, but adds another locical OR to get all of Bart's granparents. The last shows a complex query to get all of Ling's cousins.</p>
@@ -223,14 +307,15 @@
             <br>
             <p id = "query-response"></p>
         </div>
+        -->
     </div>
 </body>
 <!--Scripts-->
 <script type="text/javascript">
 // View elements
 function OrderElement(order) {
-    if (ff.debug) console.log("OrderElement() received order: "+order.guid+" that has "+order.orderLines.length+" orderLines");
-    if (ff.debug) console.log("OrderElement() vendor is: "+JSON.stringify(order.vendor));
+    if (G_DEBUG) console.log("OrderElement() received order: "+order.guid+" that has "+order.orderLines.length+" orderLines");
+    if (G_DEBUG) console.log("OrderElement() vendor is: "+JSON.stringify(order.vendor));
     var mediaDiv = document.createElement("div");
     mediaDiv.className = "media";
     var imgA = document.createElement("a");
@@ -282,7 +367,7 @@ function OrderElement(order) {
     mediaBody.appendChild(orderSummary);
     orderSummary.innerHTML = "<br>Order total: "+order.total;
     for(var i = 0; i < order.orderLines.length; i++) {
-        if (ff.debug) console.log("OrderElement() product is: "+JSON.stringify(order.orderLines[i].product));
+        if (G_DEBUG) console.log("OrderElement() product is: "+JSON.stringify(order.orderLines[i].product));
         var orderLineElement = new OrderLineElement(order.orderLines[i]);
         ordersT.appendChild(orderLineElement);    
     }
@@ -300,7 +385,7 @@ function OrderLineElement(orderLine) {
     return itemTR;
 }
 function OrdersJSONElement (ordersArr) {
-    if (ff.debug) console.log("OrdersJSONElement received: "+ordersArr.length+" orders.");
+    if (G_DEBUG) console.log("OrdersJSONElement received: "+ordersArr.length+" orders.");
     var elStr = "";
     var wellWrap = document.createElement("div");
     wellWrap.className = "well blue";
@@ -322,9 +407,364 @@ function OrdersJSONElement (ordersArr) {
     responseP.innerHTML = elStr;
     return wellWrap;
 }
+function OrderLinesJSONElement (orderLinesArr) {
+    if (G_DEBUG) console.log("OrdersJSONElement received: "+orderLinesArr.length+" orderLines.");
+    var elStr = "";
+    var wellWrap = document.createElement("div");
+    wellWrap.className = "well blue";
+    var responseP = document.createElement("p");
+    wellWrap.appendChild(responseP);    
+    if(!orderLinesArr || orderLinesArr.length <= 0) {
+        elStr = "You do not have permission to see any OrderLine objects from the /OrderLines collection."
+    } else {
+        var word = "object was";
+        if(orderLinesArr.length > 1) word = "objects were"
+        elStr = orderLinesArr.length +" OrderLines "+word+" retrieved from the /OrderLines Collection with data: ";
+        var str = js_beautify(JSON.stringify(orderLinesArr), {
+            indent_size: 4,
+            indent_char: '&nbsp;',
+            linefeed_char: '<br>'
+        });
+        elStr += str;
+    }
+    responseP.innerHTML = elStr;
+    return wellWrap;
+}
+function GetGraphData(someJSON) {
+    var graph = {nodes:[],edges:[]};
+    var toProcess = {};
+    var processed = {};
+    var allObjects = [];
+    if(Array.isArray(someJSON)) {
+        allObjects = someJSON;
+    } else {
+        allObjects.push(someJSON);
+    }
+    // assume objects in an array
+    for (i = 0; i < allObjects.length; i++) {
+        toProcess[allObjects[i].ffUrl] = allObjects[i];
+        allObjects[allObjects[i].ffUrl] = allObjects[i];
+    }
+    function ProcessObject(anObj) {
+        if(ContainsObject(anObj, graph.nodes)) {
+            if (G_DEBUG) console.log(anObj+" is already in the nodes array");
+        } else {
+            graph.nodes.push(anObj);
+        }
+        // check for ffRefs
+        if(anObj.ffRefs && anObj.ffRefs.length >0) {
+            for(var j = 0; j < anObj.ffRefs.length; j++) {
+                // get the obj and add a node
+                var refObj = anObj[anObj.ffRefs[j].name];
+                if(refObj) {
+                    if (G_DEBUG) console.log("refObj is "+refObj);
+                    if(ContainsObject(refObj, graph.nodes)) {
+                        if (G_DEBUG) console.log(refObj+" is already in the nodes array");
+                    } else {
+                        graph.nodes.push(refObj);
+                        toProcess[refObj.ffUrl] = refObj;
+                    }
+                    // add an edge for reference
+                    var edge = {p:anObj.ffUrl,c:refObj.ffUrl,l:anObj.ffRefs[j].name};
+                    if(ContainsObject(edge, graph.edges)) {
+                        if (G_DEBUG) console.log(edge+" is already in the edges array");
+                    } else {                        
+                        graph.edges.push(edge);
+                    }                        
+                }
+            }
+        }
+        // look for arrays of objects (grabbag)
+        for (var key in anObj) {
+            var member = anObj[key];
+            if(Array.isArray(member) && key !== "ffRefs") {
+                if (G_DEBUG) console.log("found grabbag "+key+", "+member);
+                for(var k = 0; k < member.length; k++) {
+                    var gbObj = member[k];
+                    if (G_DEBUG) console.log("gbObj is "+gbObj);
+                    graph.edges.push(edge);
+                    toProcess[gbObj.ffUrl] = gbObj;
+                    if(ContainsObject(gbObj, graph.nodes)) {
+                        if (G_DEBUG) console.log(gbObj+" is already in the nodes array");
+                    } else {
+                        graph.nodes.push(gbObj);
+                        toProcess[gbObj.ffUrl] = gbObj;
+                    }
+                    // add an edge for reference
+                    if(ContainsObject(edge, graph.edges)) {
+                        if (G_DEBUG) console.log(edge+" is already in the edges array");
+                    } else {                        
+                        var edge = {p:anObj.ffUrl,c:gbObj.ffUrl,l:key};
+                        graph.edges.push(edge);
+                    }
+                }
+            } else {
+                if (G_DEBUG) console.log("member "+key+", "+member+" is not an Array");                    
+            }
+        }
+    }
+    while ((keysToProcess = Object.keys(toProcess)).length != 0) {
+        for (i = 0; i < keysToProcess.length; i++) {
+            var thisFFUrl = keysToProcess[i];
+            thisObj = toProcess[thisFFUrl];
+            ProcessObject(thisObj);
+            delete toProcess[thisFFUrl];
+        }
+    }
+    graph.nodeCount = graph.nodes.length;
+    graph.edgeCount = graph.edges.length;
+    return graph;
+}
+function GetFFDLGraphData(someJSON) {
+    var graph = {nodes:[],edges:[]};
+    var toProcess = {};
+    var processed = {};
+    var allObjects = [];
+    var objectTypes = [];
+    var collections = [];
+    var eventHandlers = [];
+    
+    // get objecttype definitions
+    objectTypes = someJSON["objectTypes"];
+    for (i = 0; i < objectTypes.length; i++) {
+        if(objectTypes[i].objectTypeName == "*") {
+            if (G_DEBUG) console.log(objectTypes[i].objectTypeName+" will be ignored");
+        } else {
+            var guid = "ot"+objectTypes[i].objectTypeName;
+            var label = objectTypes[i].objectTypeName;
+            var node = {guid:guid,label:label};
+            // add in nodes for all objecttypes
+            if(ContainsObject(node, graph.nodes)) {
+                if (G_DEBUG) console.log(node+" is already in the nodes array");
+            } else {
+                graph.nodes.push(node);
+            }
+            // add to toProcess and allObjects to process references and grabbags next
+            toProcess[guid] = objectTypes[i];
+            allObjects[guid] = objectTypes[i];            
+        }
+    }
+    // get collection resources
+    collections = someJSON["collectionResources"];
+    for (i = 0; i < collections.length; i++) {
+        if(collections[i].collectionName == "/Locations") {
+            if (G_DEBUG) console.log(objectTypes[i].collectionName+" objectTypeNames will be changed to Location");
+            collections[i].objectTypeNames=["Location"];
+        } 
+        var guid = "cr"+collections[i].collectionName;
+        var label = collections[i].collectionName;
+        var node = {guid:guid,label:label};
+        toProcess[guid] = collections[i];
+        allObjects[guid] = collections[i];
+        if(ContainsObject(node, graph.nodes)) {
+            if (G_DEBUG) console.log(node+" is already in the nodes array");
+        } else {
+            graph.nodes.push(node);
+        }
+        // add in edge for collections to objecttype relationships
+        if(collections[i].objectTypeNames && collections[i].objectTypeNames.length >0) {
+            for (j = 0; j < collections[i].objectTypeNames.length; j++) {
+                var ot = collections[i].objectTypeNames[j];
+                var edge = {p:"ot"+ot,c:node.guid,l:""};
+                if(ContainsObject(edge, graph.edges)) {
+                    if (G_DEBUG) console.log(edge+" is already in the edges array");
+                } else {
+                    graph.edges.push(edge);
+                }            
+            }
+        }        
+        if(collections[i].eventHandlers && collections[i].eventHandlers.length > 0){
+            for (j = 0; j < collections[i].eventHandlers.length; j++) {
+                var eh = collections[i].eventHandlers[j];
+                var n = eh.name;
+                var hguid = "eh"+n;
+                var hlabel = eh.appEventType+" "+eh.handlerType+" "+eh.script.scriptText;
+                var handler = {guid:hguid,label:hlabel};
+                if(ContainsObject(handler, graph.nodes)) {
+                    if (G_DEBUG) console.log(handler+" is already in the nodes array");
+                } else {
+                    graph.nodes.push(handler);
+                }
+                // add in the edge
+                var edge = {p:node.guid,c:handler.guid,l:n};
+                if(ContainsObject(edge, graph.edges)) {
+                    if (G_DEBUG) console.log(edge+" is already in the edges array");
+                } else {
+                    graph.edges.push(edge);
+                }
+            }
+        }
+    }
+    // add in edges for references and grabbags
+    function ProcessObjectType(anObjType) {
+        var fields = anObjType.fields;
+        if(fields && fields.length >0 ) {
+            for(var i = 0; i < anObjType.fields.length; i++) {
+                // check for references
+                var field = anObjType.fields[i];
+                if(field.memberType == "REFERENCE" && field.collectionName) {
+                    var p = "ot"+anObjType.objectTypeName;
+                    var c = "cr"+field.collectionName;
+                    var l = field.fieldName;
+                    var edge = {p:p,c:c,l:l};                    
+                    graph.edges.push(edge);
+                }
+                if(field.memberType == "GRABBAG" && field.collectionName) {
+                    var p = "ot"+anObjType.objectTypeName;
+                    var c = "cr"+field.collectionName;
+                    var l = field.fieldName;
+                    var edge = {p:p,c:c,l:l};                    
+                    graph.edges.push(edge);
+                }
+            }            
+        }
+    }
+    while ((keysToProcess = Object.keys(toProcess)).length != 0) {
+        for (i = 0; i < keysToProcess.length; i++) {
+            var thisFFUrl = keysToProcess[i];
+            thisObj = toProcess[thisFFUrl];
+            ProcessObjectType(thisObj);
+            delete toProcess[thisFFUrl];
+        }
+    }
+    graph.nodeCount = graph.nodes.length;
+    graph.edgeCount = graph.edges.length;
+    return graph;
+}
+function DrawFFDLGraph(graphData, element) {
+    if (G_DEBUG) console.log(graphData);
+    if (G_DEBUG) console.log(element);
+    // wipe existing content
+    element.innerHTML = "";
+    var st = element.id;
+    // set up the graph elements
+    if (G_DEBUG) console.log("element.offsetWidth "+element.offsetWidth);
+    if (G_DEBUG) console.log("element.offsetHeight "+element.offsetHeight);    
+    var	margin = {top: 30, right: 20, bottom: 30, left: 50},
+    width = element.offsetWidth - margin.left - margin.right,
+    height = element.offsetHeight - margin.top - margin.bottom;
+    var	chart1 = d3.select("#"+st)
+    	.append("svg")
+    		.attr("width", width + margin.left + margin.right)
+    		.attr("height", height + margin.top + margin.bottom)
+    	.append("g")
+    		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var g = new dagreD3.Digraph();
+    // Add nodes to the graph. The first argument is the node id. The second is
+    // metadata about the node. In this case we're going to add labels to each of
+    // our nodes.
+    if(graphData.nodes && graphData.nodes.length >0) {
+        for(var i = 0; i < graphData.nodes.length; i++) {
+            if(g.hasNode(graphData.nodes[i].guid)) {
+                if (G_DEBUG) console.log("graph node already exists "+graphData.nodes[i].guid)
+            } else {
+                console.log("adding graph node "+graphData.nodes[i].guid)
+                g.addNode(graphData.nodes[i].guid, {label:graphData.nodes[i].label});                
+            }
+        }        
+    }
+    if(graphData.edges && graphData.edges.length >0) {
+        for(var i = 0; i < graphData.edges.length; i++) {
+            g.addEdge(null, graphData.edges[i].p, graphData.edges[i].c, {label:graphData.edges[i].l});
+        }        
+    }
+
+    var svg = d3.select('svg'),
+    svgGroup = svg.select('g');
+    var renderer = new dagreD3.Renderer();
+
+    // Set initial zoom to 100%
+    var initialScale = 1.00;
+    var zoom = d3.behavior.zoom().on("zoom", function() {
+          inner.attr("transform", "translate(" + d3.event.translate + ")" +
+                                      "scale(" + d3.event.scale + ")");
+        });
+    svg.call(zoom);
+
+    // Run the renderer. This is what draws the final graph.
+    var layout = dagreD3.layout()
+                        .nodeSep(20)
+                        .rankDir("LR");
+    renderer.layout(layout).run(g, svgGroup);
+
+    // Center the graph
+    // var xCenterOffset = (svg.attr('width') - layout.graph().width * initialScale) / 2;
+    // svgGroup.attr('transform', 'translate(' + xCenterOffset + ', 20)');
+    // svg.attr('height', layout.graph().height * initialScale + 40);
+
+}
+function DrawGraph(graphData, element) {
+    if (G_DEBUG) console.log(graphData);
+    if (G_DEBUG) console.log(element);
+    // wipe existing content
+    element.innerHTML = "";
+    var st = element.id;
+    // set up the graph elements
+    if (G_DEBUG) console.log("element.offsetWidth "+element.offsetWidth);
+    if (G_DEBUG) console.log("element.offsetHeight "+element.offsetHeight);    
+    var	margin = {top: 30, right: 20, bottom: 30, left: 50},
+    width = element.offsetWidth - margin.left - margin.right,
+    height = element.offsetHeight - margin.top - margin.bottom;
+    var	chart1 = d3.select("#"+st)
+    	.append("svg")
+    		.attr("width", width + margin.left + margin.right)
+    		.attr("height", height + margin.top + margin.bottom)
+    	.append("g")
+    		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var g = new dagreD3.Digraph();
+    // Add nodes to the graph. The first argument is the node id. The second is
+    // metadata about the node. In this case we're going to add labels to each of
+    // our nodes.
+    if(graphData.nodes && graphData.nodes.length >0) {
+        for(var i = 0; i < graphData.nodes.length; i++) {
+            if(g.hasNode(graphData.nodes[i].ffUrl)) {
+                if (G_DEBUG) console.log("graph node already exists "+graphData.nodes[i].ffUrl)
+            } else {
+                console.log("adding graph node "+graphData.nodes[i].ffUrl)
+                g.addNode(graphData.nodes[i].ffUrl, {label:graphData.nodes[i].ffRL+"/"+graphData.nodes[i].guid});                
+            }
+        }        
+    }
+    if(graphData.edges && graphData.edges.length >0) {
+        for(var i = 0; i < graphData.edges.length; i++) {
+            g.addEdge(null, graphData.edges[i].p, graphData.edges[i].c, {label:graphData.edges[i].l});
+        }        
+    }
+
+    var svg = d3.select('svg'),
+    svgGroup = svg.select('g');
+    var renderer = new dagreD3.Renderer();
+
+    // Set initial zoom to 100%
+    var initialScale = 1.00;
+    var zoom = d3.behavior.zoom().on("zoom", function() {
+          inner.attr("transform", "translate(" + d3.event.translate + ")" +
+                                      "scale(" + d3.event.scale + ")");
+        });
+    chart1.call(zoom);
+    // var zoom = dagreD3.zoom.panAndZoom(svgGroup);
+    // dagreD3.zoom(svg, zoom);
+    // We must set the zoom and then trigger the zoom event to synchronize D3 and
+    // the DOM.
+    // zoom.scale(initialScale).event(svg);
+
+    // Run the renderer. This is what draws the final graph.
+    var layout = dagreD3.layout()
+                        .nodeSep(20)
+                        .rankDir("LR");
+    renderer.layout(layout).run(g, chart1);
+
+    // Center the graph
+    // var xCenterOffset = (svg.attr('width') - layout.graph().width * initialScale) / 2;
+    // svgGroup.attr('transform', 'translate(' + xCenterOffset + ', 20)');
+    // svg.attr('height', layout.graph().height * initialScale + 40);
+
+}
 // View methods
-function GetRandomCustomerGraph() {
-    var el = document.getElementById('customer-graph-response');
+function GetRandomCustomer() {
+    var el = document.getElementById('customer-response-customer');
     el.innerHTML = "";
     // login as admin to get access to all customer records
     ff.login("adam@bizgraph.com", "asdf", function() {
@@ -342,6 +782,7 @@ function GetRandomCustomerGraph() {
                     indent_char: '&nbsp;',
                     linefeed_char: '<br>'
                 });
+                G_CUSTOMER = obj;
                 var wellWrap = document.createElement("div");
                 wellWrap.className = "well blue";
                 el.appendChild(wellWrap);
@@ -349,7 +790,7 @@ function GetRandomCustomerGraph() {
                 wellWrap.appendChild(responseP);
                 elStr = "A Customer object was retrieved from the /Customers Collection with data: "+str;
                 responseP.innerHTML = elStr;
-                $('#customer-graph-tabs a[href="#customer-graph-response"]').tab('show') // Select tab by name
+                $('#customer-tabs a[href="#customer-response-customer"]').tab('show') // Select tab by name
             }
         }, function(code, msg) {
             el.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
@@ -360,10 +801,80 @@ function GetRandomCustomerGraph() {
         console.error("GetCustomerGraph.login() Error: "+code+" "+msg);
     });
 }
+function GetFFDL() {
+    var el = document.getElementById('ffdl-response-json');
+    el.innerHTML = "";
+    ff.getFFDL(function(obj) {
+        var str = "";
+        var elStr = "";
+        if(!obj) alert("Not able to retrieve FFDL!");
+        else {
+            var heading = document.createElement("h3");
+            heading.innerHTML = "Response:"
+            el.appendChild(heading);
+            str = js_beautify(JSON.stringify(obj), {
+                indent_size: 4,
+                indent_char: '&nbsp;',
+                linefeed_char: '<br>'
+            });
+            G_FFDL = obj;
+            var wellWrap = document.createElement("div");
+            wellWrap.className = "well blue";
+            el.appendChild(wellWrap);
+            var responseP = document.createElement("p");
+            wellWrap.appendChild(responseP);
+            elStr = "This API metadata was retrieved with data: "+str;
+            responseP.innerHTML = elStr;
+            $('#ffdl-tabs a[href="#ffdl-response-json"]').tab('show') // Select tab by name
+        }
+    }, function(code, msg) {
+        el.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
+        console.error("GetFFDL.getFFDL() Error: "+code+" "+msg);
+    });
+}
+function GetOrderLinesForProduct(u, p, prod) {
+    if (G_DEBUG) console.log("GetOrderLinesForProduct logging in as userName: "+u+", password: "+p);
+    var orderLinesResponseEl = document.getElementById('orderlines-backreference-response-orderlines');
+    var orderLinesResponseJSONEl = document.getElementById('orderlines-backreference-response-json');
+    var orderLinesResponseGraphEl = document.getElementById('orderlines-backreference-response-graph');
+    // Login the user
+    ff.login(u, p, function() {
+        // get all orderLines for the user
+        ff.getArrayFromUri("/Products/"+prod+"/BackReferences.OrderLines.product", function(orderLinesArr) {
+            orderLinesResponseEl.innerHTML= "";
+            $('#orderlines-backreference-tabs a[href="#orderlines-backreference-response-orderlines"]').tab('show'); // Select tab by name
+            if(!orderLinesArr || orderLinesArr.length <= 0) {
+                orderLinesResponseEl.innerHTML = "<br>You do not have permission to see any OrderLine objects from the /OrderLines collection."
+            } else {
+                if (G_DEBUG) console.log("GetOrderLines.getArrayFromUri() Retrieved: "+orderLinesArr.length+" orderLines.");
+                orderLinesResponseEl.innerHTML = "";
+                var orderLinesH3 = document.createElement("h3");
+                orderLinesH3.innerHTML = "Retrieved "+orderLinesArr.length+" OrderLines.";
+                orderLinesResponseEl.appendChild(orderLinesH3);
+                for(var i = 0; i < orderLinesArr.length; i++) {
+                    var orderLineEl = new OrderLineElement(orderLinesArr[i]);
+                    orderLinesResponseEl.appendChild(orderLineEl);
+                }
+                orderLinesResponseJSONEl.innerHTML= "";
+                var orderLinesJSONEl = new OrderLinesJSONElement(orderLinesArr);
+                orderLinesResponseJSONEl.appendChild(orderLinesJSONEl);
+                // create the graph data as well
+                G_ORDERLINES = orderLinesArr;
+            }
+        }, function(code, msg) {
+            orderLinesResponseEl.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
+            console.error("GetOrderLines.getArrayFromUri() getArrayFromUri Error: "+code+" "+msg);
+        });
+    }, function(code, msg) {
+        orderLinesResponseEl.innerHTML = "<br><div class = 'well red'>Got a login error: "+msg+"</div>";
+        console.error("GetOrderLines.login() Error: "+code+" "+msg);
+    });
+} 
 function GetAllOrdersWithPermissions(u, p) {
-    if (ff.debug) console.log("GetAllOrdersWithPermissions logging is as userName: "+u+", password: "+p);
+    if (G_DEBUG) console.log("GetAllOrdersWithPermissions logging is as userName: "+u+", password: "+p);
     var ordersResponseEl = document.getElementById('orders-permissions-response-orders');
     var ordersResponseJSONEl = document.getElementById('orders-permissions-response-json');
+    var ordersResponseGraphEl = document.getElementById('orders-permissions-response-graph');
     // Login the user
     ff.login(u, p, function() {
         // get all orders for the user
@@ -373,7 +884,7 @@ function GetAllOrdersWithPermissions(u, p) {
             if(!ordersArr || ordersArr.length <= 0) {
                 ordersResponseEl.innerHTML = "<br>You do not have permission to see any Order objects from the /Orders collection."
             } else {
-                if (ff.debug) console.log("GetAllOrdersWithPermissions.getArrayFromUri() Retrieved: "+ordersArr.length+" orders.");
+                if (G_DEBUG) console.log("GetAllOrdersWithPermissions.getArrayFromUri() Retrieved: "+ordersArr.length+" orders.");
                 ordersResponseEl.innerHTML = "";
                 var ordersH3 = document.createElement("h3");
                 ordersH3.innerHTML = "Retrieved "+ordersArr.length+" Orders.";
@@ -395,6 +906,8 @@ function GetAllOrdersWithPermissions(u, p) {
                 ordersResponseJSONEl.innerHTML= "";
                 var ordersJSONEl = new OrdersJSONElement(ordersArr);
                 ordersResponseJSONEl.appendChild(ordersJSONEl);
+                // create the graph data as well
+                G_ORDERS = ordersArr;
             }
         }, function(code, msg) {
             el.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
@@ -408,7 +921,7 @@ function GetAllOrdersWithPermissions(u, p) {
     });
 } 
 function GetCustomerGraph() {
-    var el = document.getElementById('get-datagraph-response');
+    var el = document.getElementById('customer-response-customer');
     el.innerHTML = "";
     ff.login("adam@bizgraph.com", "asdf", function() {
         ff.getArrayFromUri("/Customers", function(arr) {
@@ -696,6 +1209,74 @@ function QRCode (obj) {
 var ff = new FatFractal();
 ff.setAutoLoadRefs(true);
 ff.setAutoLoadBlobs(false);
-ff.setDebug (false);
+ff.setDebug(false);
+// This will create the correct size for the graph data
+var G_DEBUG = ff.getDebug();
+var G_CUSTOMER;
+var G_ORDERS;
+var G_ORDERLINES;
+var G_FFDL;
+$(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+    if (G_DEBUG) console.log('Active Tab ' + e.target); // Active Tab
+    var st = e.target.id;
+    if (G_DEBUG) console.log("tab id is: "+st);
+    if(st) {
+        if(st == "orders-permissions-response-href") {
+            if (G_DEBUG) console.log('Selected Tab ' + st); // Active Tab
+            var ele = document.getElementById('orders-permissions-response-graph');
+            ele.innerHTML = "";
+            if(!G_ORDERS || G_ORDERS.length <=0) ele.innerHTML = "Please select some orders first..."
+            else {
+                var graphData = GetGraphData(G_ORDERS);
+                if(graphData) {
+                    ele.style.width = "800px";
+                    ele.style.height = "600px";
+                    DrawGraph(graphData, ele);  
+                } else ele.innerHTML = "Not able to read graph data..."
+            }
+        } else if(st == "customer-response-graph-href") {
+            if (G_DEBUG) console.log('Selected Tab ' + st); // Active Tab
+            var ele = document.getElementById('customer-response-graph');
+            ele.innerHTML = "";
+            if(!G_CUSTOMER) ele.innerHTML = "Please select a Customer first..."
+            else {
+                var graphData = GetGraphData(G_CUSTOMER);
+                if(graphData) {
+                    ele.style.width = "800px";
+                    ele.style.height = "300px";
+                    DrawGraph(graphData, ele);  
+                } else ele.innerHTML = "Not able to read graph data..."
+            }
+        } else if(st == "orderlines-backreference-response-href") {
+            if (G_DEBUG) console.log('Selected Tab ' + st); // Active Tab
+            var ele = document.getElementById('orderlines-backreference-response-graph');
+            ele.innerHTML = "";
+            if(!G_ORDERLINES || G_ORDERLINES.length <=0) ele.innerHTML = "Please select some orders first..."
+            else {
+                var graphData = GetGraphData(G_ORDERLINES);
+                if(graphData) {
+                    ele.style.width = "800px";
+                    ele.style.height = "600px";
+                    DrawGraph(graphData, ele);  
+                } else ele.innerHTML = "Not able to read graph data..."
+            }
+        } else if(st == "ffdl-response-graph-href") {
+            if (G_DEBUG) console.log('Selected Tab ' + st); // Active Tab
+            var ele = document.getElementById('ffdl-response-graph');
+            ele.innerHTML = "";
+            if(!G_FFDL || G_FFDL.length <=0) ele.innerHTML = "Please select some ffdl first..."
+            else {
+                var graphData = GetFFDLGraphData(G_FFDL);
+                if(graphData) {
+                    ele.style.width = "800px";
+                    ele.style.height = "600px";
+                    DrawFFDLGraph(graphData, ele);  
+                } else ele.innerHTML = "Not able to read ffdl data..."
+            }
+        } else console.log("unknown tab was selected");
+    } else {
+        console.log("tab does not have an id set");
+    }
+});
 </script>
 </html>

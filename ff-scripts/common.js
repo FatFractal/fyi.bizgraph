@@ -25,7 +25,7 @@ var collections = [
     {collection:"Likes",objecttype:"Like",virtual:false},
     {collection:"Favorites",objecttype:"Vendor, Comment, Product",virtual:false},
     {collection:"QRCodes",objecttype:"QRCode",virtual:false},
-    {collection:"Locations",objecttype:"Location",virtual:false,script:"Location"}
+    {collection:"Locations",objecttype:"Location",virtual:true,script:"Location"}
 ];
 
 var debug = true;
@@ -85,7 +85,7 @@ exports.getSysAdminGroup = function() {
 exports.runDDFLDropCommands = function() {
     for (var i = 0; i < collections.length; i++) {
         var ffdl;
-        if(collections[i].vurtual) {
+        if(collections[i].virtual) {
             ffdl = "DROP COLLECTION /"+collections[i].collection;
         } else {
             ffdl = "DROP COLLECTION COMPLETELY /"+collections[i].collection;            
@@ -119,12 +119,11 @@ exports.runDDFLCreateCommands = function() {
     var count = collections.length;
     for (var i = 0; i < collections.length; i++) {
         var ffdl;
-        if(collections[i].vurtual) {
+        if(collections[i].virtual) {
             ffdl = "CREATE VIRTUAL_COLLECTION /"+collections[i].collection+" as javascript:require('scripts/"+collections[i].script+"')";
         } else {
             ffdl = "CREATE COLLECTION /"+collections[i].collection+" OBJECTTYPE "+collections[i].objecttype;            
         }
-        ffdl = "CREATE COLLECTION /"+collections[i].collection+" OBJECTTYPE "+collections[i].objecttype;
         if(debug) print("common.js.runDDFLCreateCommands "+ffdl);
         ff.executeFFDL(ffdl);
     }

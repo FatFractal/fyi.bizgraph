@@ -40,6 +40,16 @@ exports.createSomeOrders = function() {
     r.mimeType = "text/html";
 }
 
+exports.createSomeProducts = function() {
+    var count = 0;
+    count += models.createSomeProducts();
+    var r = ff.response();
+    r.result = "<h1> Thanks for visiting</h1><p>We have populated "+ count + " Product and ProductImages objects for the tests.</p>";
+    r.responseCode="200";
+    r.statusMessage = "extensions.js.populate has created "+ count + " Product and ProductImages objects.";
+    r.mimeType = "text/html";
+}
+
 exports.createSomeMfgs = function() {
     var count = 0;
     count += models.createSomeMfgs();
