@@ -722,8 +722,16 @@ function DrawGraph(graphData, element) {
             if(g.hasNode(graphData.nodes[i].ffUrl)) {
                 if (G_DEBUG) console.log("graph node already exists "+graphData.nodes[i].ffUrl)
             } else {
-                console.log("adding graph node "+graphData.nodes[i].ffUrl)
-                g.addNode(graphData.nodes[i].ffUrl, {label:graphData.nodes[i].ffRL+"/"+graphData.nodes[i].guid});                
+                if (G_DEBUG) console.log("adding graph node "+graphData.nodes[i].ffUrl);
+                var label = "Permission denied";
+                if(typeof(graphData.nodes[i].ffRL) == "undefined" || typeof(graphData.nodes[i].guid) == "undefined") {
+                    if (G_DEBUG) console.log("reference access not permitted "+graphData.nodes[i].ffRL);                    
+                } else {
+                    if (G_DEBUG) console.log("reference ffRL "+graphData.nodes[i].ffRL);                    
+                    if (G_DEBUG) console.log("reference guid "+graphData.nodes[i].guid);                    
+                    label = graphData.nodes[i].ffRL+"/"+graphData.nodes[i].guid;                    
+                } 
+                g.addNode(graphData.nodes[i].ffUrl, {label:label});                
             }
         }        
     }
@@ -733,8 +741,6 @@ function DrawGraph(graphData, element) {
         }        
     }
 
-    var svg = d3.select('svg'),
-    svgGroup = svg.select('g');
     var renderer = new dagreD3.Renderer();
 
     // Set initial zoom to 100%
