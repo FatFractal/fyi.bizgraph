@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <!-- Optional theme -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <!-- Font Awesome 3.0.2 -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css">
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <!-- Latest compiled and minified JavaScript -->
@@ -32,9 +34,7 @@
     <script src="graph/d3.v3.min.js"></script>  
     <script src="//cpettitt.github.io/project/dagre-d3/v0.2.9/dagre-d3.min.js"></script>
 </head>
-<!--
-<body onunload="cleanUp()">
--->
+<!--HTML structures-->
 <body>
     <div class="navbar" id="navbar" ng-controller="LoginCtrl">
         <div class="navbar-inner">
@@ -49,7 +49,7 @@
             <p>This post demonstrates real examples of working with FatFractal's datagraph with more of an enterprise feel.
             </p>
             <h4>You can see the data created by this app using the FatFractal DataBrowser (
-                <a href = https://beta.fatfractal.com/databrowser/console/databrowser/databrowser.html?baseUrl=https://fyi.fatfractal.com/bizgraph target = _blank>
+                <a href = https://beta.fatfractal.com/databrowser/databrowser.html?baseUrl=https://fyi.fatfractal.com/bizgraph target = _blank>
                     here
                 </a>
                 )
@@ -61,7 +61,7 @@
                 )
             </h4>
             <h4>You can see the API metadata for this application (
-                <a href = https://fyi.fatfractal.com/bizgraph/ff/metadata/text target = _blank>
+                <a href = ff/metadata/text target = _blank>
                     here
                 </a>
                 )
@@ -70,16 +70,19 @@
         <div class="well" id = "ffdl-section">
             <h2>FFDL</h2>
             <p>This test application includes the following ffdl definition for Customers, Addresses and Locations.<br></p>	
-            <button id="customer-button" class="btn" onclick="GetFFDL()">Try it!</button><br><br>
+            <button id="customer-button" class="btn has-spinner btn-success" onclick="ShowFFDL()">
+                <span class="spinner"><i class="icon-spin icon-refresh"></i></span>
+                Try it!
+            </button><br><br>
             <ul class="nav nav-tabs" role="tablist" id = "ffdl-tabs">
                 <li class="active"><a href="#ffdl-request" role="tab" data-toggle="tab">Request</a></li>
-                <li><a href="#ffdl-models" role="tab" data-toggle="tab">Models</a></li>
+                <li><a href="#ffdl-response-text" role="tab" data-toggle="tab">Text</a></li>
                 <li><a href="#ffdl-response-json" role="tab" data-toggle="tab">JSON</a></li>
                 <li><a href="#ffdl-response-graph" role="tab" data-toggle="tab" id="ffdl-response-graph-href">Object Graph</a></li>
             </ul>
             <!-- Tab panes -->
             <div class="tab-content">
-                <div class="tab-pane active" id="customer-request">
+                <div class="tab-pane active" id="ffdl-request">
                     <h3>The SDK request looks like this:</h3>
                     <div class="well">
                         <p>var ffdlJSON;<br>
@@ -89,25 +92,18 @@
                         </p>
                     </div>
                 </div>
-                <div class="tab-pane" id="ffdl-models">
-                    <h3>The client models used with this example are:</h3>
-                    <div class="well">
-                        CREATE OBJECTTYPE Customer (user REFERENCE /FFUser, firstName STRING, lastName STRING, email STRING, address REFERENCE /Addresses, phone STRING, vendorAccess REFERENCE /FFUserGroup)<br>
-                        CREATE OBJECTTYPE Address (streetNo STRING, street STRING, city STRING, state STRING, country STRING, postCode STRING, location REFERENCE /Locations)<br>
-                        CREATE OBJECTTYPE Location (geo GEOLOCATION)<br>
-                        CREATE COLLECTION /Customers OBJECTTYPE Customer<br>
-                        CREATE COLLECTION /Addresses OBJECTTYPE Address<br>
-                        CREATE COLLECTION /Locations OBJECTTYPE Location<br>
-                    </div>
-                </div>
-                <div class="tab-pane" id="ffdl-response-json">...</div>
-                <div class="tab-pane" id="ffdl-response-graph"></div>
+                <div class="tab-pane" id="ffdl-response-text">Please click "Try it!" above...</div>
+                <div class="tab-pane" id="ffdl-response-json">Please click "Try it!" above...</div>
+                <div class="tab-pane" id="ffdl-response-graph">Please click "Try it!" above...</div>
             </div>
         </div>
         <div class="well" id = "customer-section">
             <h2>The Customer Graph</h2>
             <p>This example shows the graph response for a random Customer object. Note that the Customer object has embedded FFUser and Address objects and the Address object has an embedded Location object.</p>
-            <button id="customer-button" class="btn" onclick="GetRandomCustomer()">Try it!</button><br><br>
+            <button id="customer-button" class="btn has-spinner btn-success" onclick="ShowRandomCustomer()">
+                <span class="spinner"><i class="icon-spin icon-refresh"></i></span>
+                Try it!
+            </button><br><br>
             <ul class="nav nav-tabs" role="tablist" id = "customer-tabs">
                 <li class="active"><a href="#customer-request" role="tab" data-toggle="tab">Request</a></li>
                 <li><a href="#customer-models" role="tab" data-toggle="tab">Models</a></li>
@@ -157,17 +153,28 @@
                         }</p>
                     </div>
                 </div>
-                <div class="tab-pane" id="customer-response-customer">...</div>
-                <div class="tab-pane" id="customer-response-graph"></div>
+                <div class="tab-pane" id="customer-response-customer">Please click "Try it!" above...</div>
+                <div class="tab-pane" id="customer-response-graph">Please click "Try it!" above...</div>
             </div>
         </div>
         <div class="well" id = "orders-permissions-section">
             <h2>Orders with Permissions</h2>
             <p>This example shows how declarative permissions can be used to control access to data using permissions.</p>
-            <button id="orders-permissions-customer-button" class="btn" onclick="GetAllOrdersWithPermissions('nickelskevin@gmail.com','asdf')">Customer</button>
-            <button id="orders-permissions-vendor-button" class="btn" onclick="GetAllOrdersWithPermissions('adam@bestbuy.com','asdf')">Vendor</button>
-            <button id="orders-permissions-mfg-button" class="btn" onclick="GetAllOrdersWithPermissions('adam@zojurushi.com','asdf')">Manufacturer</button>         
-            <button id="orders-permissions-admin-button" class="btn" onclick="GetAllOrdersWithPermissions('adam@bizgraph.com','asdf')">System Administrator</button><br><br>
+            <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle has-spinner btn-success" type="button" id="dropdownMenu1" data-toggle="dropdown">
+                    <span class="spinner"><i class="icon-spin icon-refresh"></i></span>
+                    Select User
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                    <li role="presentation"><a role="menuitem" tabindex="-1" onclick="ShowAllOrdersWithPermissions('nickelskevin@gmail.com','asdf')">Customer</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" onclick="ShowAllOrdersWithPermissions('adam@bestbuy.com','asdf')">Vendor</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" onclick="ShowAllOrdersWithPermissions('adam@zojurushi.com','asdf')">Manufacturer</a></li>
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" onclick="ShowAllOrdersWithPermissions('adam@bizgraph.com','asdf')">System Administrator</a></li>
+                </ul>
+            </div>
+            <p></p>
             <ul class="nav nav-tabs" role="tablist" id = "orders-permissions-tabs">
                 <li class="active"><a href="#orders-permissions-request" role="tab" data-toggle="tab">Request</a></li>
                 <li><a href="#orders-permissions-models" role="tab" data-toggle="tab">Models</a></li>
@@ -222,16 +229,27 @@
                         }</p>
                     </div>
                 </div>
-                <div class="tab-pane" id="orders-permissions-response-orders">...</div>
-                <div class="tab-pane" id="orders-permissions-response-json">...</div>
-                <div class="tab-pane" id="orders-permissions-response-graph"></div>
+                <div class="tab-pane" id="orders-permissions-response-orders">Please select a user above...</div>
+                <div class="tab-pane" id="orders-permissions-response-json">Please select a user above...</div>
+                <div class="tab-pane" id="orders-permissions-response-graph">Please select a user above...</div>
             </div>
         </div>
         <div class="well" id = "backreference-section">
             <h2>Back References</h2>
             <p>This test will show you how to retrieve objects using Back References. Let's say you are the product manager for the manufacturer Zojirushi and are interested to see all cases where your product with sku B00BSEYJ3Q has been ordered. You will also note that the Stoneline admin is not permitted to see these orderlines.</p>
-            <button id="orderlines-backreference-mfg-button" class="btn" onclick="GetOrderLinesForProduct('adam@zojurushi.com','asdf', 'B00BSEYJ3Q')">Zojirushi Admin</button>
-            <button id="orderlines-backreference-mfg-button" class="btn" onclick="GetOrderLinesForProduct('adam@epson.com','asdf', 'B00BSEYJ3Q')">Stoneline Admin</button>        
+            <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle has-spinner btn-success" type="button" id="dropdownMenu2" data-toggle="dropdown">
+                    <span class="spinner"><i class="icon-spin icon-refresh"></i></span>
+                    Select Mfg Admin
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                    <li role="presentation"><a role="menuitem" tabindex="-1" onclick="ShowOrderLinesForProduct('adam@stoneline.com','asdf', 'B00E9BYFIE')">Stoneline</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" onclick="ShowOrderLinesForProduct('adam@epson.com','asdf', 'B00CBAPEYE')">Epson</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" onclick="ShowOrderLinesForProduct('adam@zojurushi.com','asdf', 'B0074CDG6C')">Zojirushi</a></li>
+                </ul>
+            </div>
+            <p></p>
             <ul class="nav nav-tabs" role="tablist" id = "orderlines-backreference-tabs">
                 <li class="active"><a href="#orderlines-backreference-request" role="tab" data-toggle="tab">Request</a></li>
                 <li><a href="#orderlines-backreference-models" role="tab" data-toggle="tab">Models</a></li>
@@ -287,32 +305,30 @@
                         }</p>
                     </div>
                 </div>
-                <div class="tab-pane" id="orderlines-backreference-response-orderlines">...</div>
-                <div class="tab-pane" id="orderlines-backreference-response-json">...</div>
-                <div class="tab-pane" id="orderlines-backreference-response-graph"></div>
+                <div class="tab-pane" id="orderlines-backreference-response-orderlines">Please select an Admin user above...</div>
+                <div class="tab-pane" id="orderlines-backreference-response-json">Please select an Admin user above...</div>
+                <div class="tab-pane" id="orderlines-backreference-response-graph">Please select an Admin user above...</div>
             </div>
         </div>
-        <!--
-        <div class="well" id = "query-section">
-            <h2>Queries</h2>
-            <p>This test will show you how to retrieve objects using various queries. There are five examples in this section. The first example will get all the Customer objects that have a "father" Reference member (Note that the returned values are deduplicated). The second is basically the same, but uses the "mother" Reference member. The third example shows the use of a logical OR to get all of Bart's granparents. The fourth example is similar, but adds another locical OR to get all of Bart's granparents. The last shows a complex query to get all of Ling's cousins.</p>
-            <div class="well">
-                <p>var orders;<br>
-                    ff.getArrayFromUri("/Orders"), function(response) {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;fathers = response;<br>
-                    });<br>
-                </p>
-            </div>
-            <button id="orders-query-button" class="btn" onclick="everyOrderQuery()">All fathers!</button>
-            <br>
-            <p id = "query-response"></p>
-        </div>
-        -->
     </div>
 </body>
 <!--Scripts-->
 <script type="text/javascript">
 // View elements
+function FFDLTextElement() {
+    var FFDLTextDiv = document.createElement("div");
+    var FFDLTextH3 = document.createElement("h3");
+    FFDLTextH3.innerHTML = "Pretty printed API metadata read from /ff/metadata/text:";
+    FFDLTextDiv.appendChild(FFDLTextH3);    
+    var FFDLTextIFrame = document.createElement("iframe");
+    FFDLTextDiv.appendChild(FFDLTextIFrame);    
+    // FFDLTextIFrame.src = "ff/metadata/text";
+    FFDLTextIFrame.setAttribute("src", "ff/metadata/text");
+    FFDLTextIFrame.setAttribute("id", "ffdl-text-frame");
+    FFDLTextIFrame.setAttribute("width", "800");
+    FFDLTextIFrame.setAttribute("height", "600");    
+    return FFDLTextDiv;
+}
 function OrderElement(order) {
     if (G_DEBUG) console.log("OrderElement() received order: "+order.guid+" that has "+order.orderLines.length+" orderLines");
     if (G_DEBUG) console.log("OrderElement() vendor is: "+JSON.stringify(order.vendor));
@@ -375,12 +391,14 @@ function OrderElement(order) {
 }
 function OrderLineElement(orderLine) {
     var itemTR = document.createElement("tr");
+    var qc = "";
+    if(orderLine.product.qrcode) qc = "<img src=/bizgraph"+orderLine.product.qrcode.ffUrl+"/image></img>";
     var str = "<td width=150px; height=150px; align=center valign=middle><img src=/bizgraph"+orderLine.product.image.ffUrl+"/image></img></td>"+
-    "<td width=70px; style=text-align:center>"+orderLine.quantity+"</td>"+
-    "<td width=300px;>"+orderLine.product.description+"</td>"+
-    "<td width=70px; style=text-align:center>$"+orderLine.price+"</td>"+
-    "<td width=70px; style=text-align:center>$"+orderLine.total+"</td>"+
-    "<td width=150px; height=150px; align=center valign=middle><img src=/bizgraph"+orderLine.product.qrcode.ffUrl+"/image></img></td>"
+        "<td width=70px; style=text-align:center>"+orderLine.quantity+"</td>"+
+        "<td width=300px;>"+orderLine.product.description+"</td>"+
+        "<td width=70px; style=text-align:center>$"+orderLine.price+"</td>"+
+        "<td width=70px; style=text-align:center>$"+orderLine.total+"</td>"+
+        "<td width=150px; height=150px; align=center valign=middle>"+qc+"</td>";
     itemTR.innerHTML = str;
     return itemTR;
 }
@@ -515,7 +533,7 @@ function GetGraphData(someJSON) {
     graph.edgeCount = graph.edges.length;
     return graph;
 }
-function GetFFDLGraphData(someJSON) {
+function ShowFFDLGraphData(someJSON) {
     var graph = {nodes:[],edges:[]};
     var toProcess = {};
     var processed = {};
@@ -769,7 +787,7 @@ function DrawGraph(graphData, element) {
 
 }
 // View methods
-function GetRandomCustomer() {
+function ShowRandomCustomer() {
     var el = document.getElementById('customer-response-customer');
     el.innerHTML = "";
     // login as admin to get access to all customer records
@@ -797,18 +815,20 @@ function GetRandomCustomer() {
                 elStr = "A Customer object was retrieved from the /Customers Collection with data: "+str;
                 responseP.innerHTML = elStr;
                 $('#customer-tabs a[href="#customer-response-customer"]').tab('show') // Select tab by name
+                $('a, button').removeClass('active');            
             }
         }, function(code, msg) {
             el.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
-            console.error("GetCustomerGraph.getArrayFromUri() getArrayFromUri Error: "+code+" "+msg);
+            console.error("ShowCustomerGraph.getArrayFromUri() getArrayFromUri Error: "+code+" "+msg);
         });
     }, function(code, msg) {
         el.innerHTML = "<br><div class = 'well red'>Got a login error: "+msg+"</div>";
-        console.error("GetCustomerGraph.login() Error: "+code+" "+msg);
+        console.error("ShowCustomerGraph.login() Error: "+code+" "+msg);
     });
 }
-function GetFFDL() {
+function ShowFFDL() {
     var el = document.getElementById('ffdl-response-json');
+    var textEl = document.getElementById('ffdl-response-text');
     el.innerHTML = "";
     ff.getFFDL(function(obj) {
         var str = "";
@@ -831,15 +851,21 @@ function GetFFDL() {
             wellWrap.appendChild(responseP);
             elStr = "This API metadata was retrieved with data: "+str;
             responseP.innerHTML = elStr;
-            $('#ffdl-tabs a[href="#ffdl-response-json"]').tab('show') // Select tab by name
+            $('#ffdl-tabs a[href="#ffdl-response-json"]').tab('show'); // Select tab by name
+            $('a, button').removeClass('active');
+            // add in the FFDl Irame
+            var textContent = new FFDLTextElement();
+            textEl.innerHTML = "";
+            textEl.appendChild(textContent);
         }
     }, function(code, msg) {
         el.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
-        console.error("GetFFDL.getFFDL() Error: "+code+" "+msg);
+        textEl.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
+        console.error("ShowFFDL.getFFDL() Error: "+code+" "+msg);
     });
 }
-function GetOrderLinesForProduct(u, p, prod) {
-    if (G_DEBUG) console.log("GetOrderLinesForProduct logging in as userName: "+u+", password: "+p);
+function ShowOrderLinesForProduct(u, p, prod) {
+    if (G_DEBUG) console.log("ShowOrderLinesForProduct logging in as userName: "+u+", password: "+p);
     var orderLinesResponseEl = document.getElementById('orderlines-backreference-response-orderlines');
     var orderLinesResponseJSONEl = document.getElementById('orderlines-backreference-response-json');
     var orderLinesResponseGraphEl = document.getElementById('orderlines-backreference-response-graph');
@@ -851,6 +877,7 @@ function GetOrderLinesForProduct(u, p, prod) {
             $('#orderlines-backreference-tabs a[href="#orderlines-backreference-response-orderlines"]').tab('show'); // Select tab by name
             if(!orderLinesArr || orderLinesArr.length <= 0) {
                 orderLinesResponseEl.innerHTML = "<br>You do not have permission to see any OrderLine objects from the /OrderLines collection."
+                $('a, button').removeClass('active');            
             } else {
                 if (G_DEBUG) console.log("GetOrderLines.getArrayFromUri() Retrieved: "+orderLinesArr.length+" orderLines.");
                 orderLinesResponseEl.innerHTML = "";
@@ -866,6 +893,7 @@ function GetOrderLinesForProduct(u, p, prod) {
                 orderLinesResponseJSONEl.appendChild(orderLinesJSONEl);
                 // create the graph data as well
                 G_ORDERLINES = orderLinesArr;
+                $('a, button').removeClass('active');            
             }
         }, function(code, msg) {
             orderLinesResponseEl.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
@@ -876,8 +904,8 @@ function GetOrderLinesForProduct(u, p, prod) {
         console.error("GetOrderLines.login() Error: "+code+" "+msg);
     });
 } 
-function GetAllOrdersWithPermissions(u, p) {
-    if (G_DEBUG) console.log("GetAllOrdersWithPermissions logging is as userName: "+u+", password: "+p);
+function ShowAllOrdersWithPermissions(u, p) {
+    if (G_DEBUG) console.log("ShowAllOrdersWithPermissions logging is as userName: "+u+", password: "+p);
     var ordersResponseEl = document.getElementById('orders-permissions-response-orders');
     var ordersResponseJSONEl = document.getElementById('orders-permissions-response-json');
     var ordersResponseGraphEl = document.getElementById('orders-permissions-response-graph');
@@ -890,7 +918,7 @@ function GetAllOrdersWithPermissions(u, p) {
             if(!ordersArr || ordersArr.length <= 0) {
                 ordersResponseEl.innerHTML = "<br>You do not have permission to see any Order objects from the /Orders collection."
             } else {
-                if (G_DEBUG) console.log("GetAllOrdersWithPermissions.getArrayFromUri() Retrieved: "+ordersArr.length+" orders.");
+                if (G_DEBUG) console.log("ShowAllOrdersWithPermissions.getArrayFromUri() Retrieved: "+ordersArr.length+" orders.");
                 ordersResponseEl.innerHTML = "";
                 var ordersH3 = document.createElement("h3");
                 ordersH3.innerHTML = "Retrieved "+ordersArr.length+" Orders.";
@@ -903,7 +931,7 @@ function GetAllOrdersWithPermissions(u, p) {
                     }, function(code, msg) {
                         ordersResponseEl.innerHTML = "<br><div class = 'well red'>OrderElement.getObjFromUri() error: "+msg+"</div>";
                         ordersResponseJSONEl.innerHTML = "<br><div class = 'well red'>OrderElement.getObjFromUri() error: "+msg+"</div>";
-                        console.error("GetAllOrdersWithPermissions.grabBagGetAll() Error: "+code+" "+msg);
+                        console.error("ShowAllOrdersWithPermissions.grabBagGetAll() Error: "+code+" "+msg);
                     });
                 }                            
                 for(var i = 0; i < ordersArr.length; i++) {
@@ -914,19 +942,20 @@ function GetAllOrdersWithPermissions(u, p) {
                 ordersResponseJSONEl.appendChild(ordersJSONEl);
                 // create the graph data as well
                 G_ORDERS = ordersArr;
+                $('a, button').removeClass('active');            
             }
         }, function(code, msg) {
             el.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
             ordersResponseEl.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
-            console.error("GetAllOrdersWithPermissions.getArrayFromUri() getArrayFromUri Error: "+code+" "+msg);
+            console.error("ShowAllOrdersWithPermissions.getArrayFromUri() getArrayFromUri Error: "+code+" "+msg);
         });
     }, function(code, msg) {
         el.innerHTML = "<br><div class = 'well red'>Got a login error: "+msg+"</div>";
         ordersResponseEl.innerHTML = "<br><div class = 'well red'>Got a login error: "+msg+"</div>";
-        console.error("GetAllOrdersWithPermissions.login() Error: "+code+" "+msg);
+        console.error("ShowAllOrdersWithPermissions.login() Error: "+code+" "+msg);
     });
 } 
-function GetCustomerGraph() {
+function ShowCustomerGraph() {
     var el = document.getElementById('customer-response-customer');
     el.innerHTML = "";
     ff.login("adam@bizgraph.com", "asdf", function() {
@@ -967,41 +996,16 @@ function GetCustomerGraph() {
                 mediaBody.appendChild(mediaHeading); 
                 elStr = arr.length+" Customer objects were retrieved from the Customers Collection with data: "+str;
                 mediaHeading.innerHTML = "<br><div class = 'well blue'>"+elStr+"</div>";
+                $('a, button').removeClass('active');            
             }
         }, function(code, msg) {
             el.innerHTML = "<br><div class = 'well red'>Got an error: "+msg+"</div>";
-            console.error("GetCustomerGraph.getArrayFromUri() getArrayFromUri Error: "+code+" "+msg);
+            console.error("ShowCustomerGraph.getArrayFromUri() getArrayFromUri Error: "+code+" "+msg);
         });
     }, function(code, msg) {
         el.innerHTML = "<br><div class = 'well red'>Got a login error: "+msg+"</div>";
-        console.error("GetCustomerGraph.login() Error: "+code+" "+msg);
+        console.error("ShowCustomerGraph.login() Error: "+code+" "+msg);
     });
-}
-function ArrayBufferToDataUri(arrayBuffer) {
-    var base64 = '',
-    encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
-    bytes = new Uint8Array(arrayBuffer), byteLength = bytes.byteLength,
-    byteRemainder = byteLength % 3, mainLength = byteLength - byteRemainder,
-    a, b, c, d, chunk;
-    for (var i = 0; i < mainLength; i = i+3) {
-        chunk = (bytes[i] << 16) | (bytes[i+1] << 8) | bytes[i+2];
-        a = (chunk & 16515072) >> 18; b = (chunk & 258048) >> 12;
-        c = (chunk & 4032) >> 6; d = chunk & 63;
-        base64 += encodings[a]+encodings[b]+encodings[c]+encodings[d];
-    }
-    if (byteRemainder == 1) {
-        chunk = bytes[mainLength];
-        a = (chunk & 252) >> 2;
-        b = (chunk & 3) << 4;
-        base64 += encodings[a]+encodings[b]+'==';
-    } else if (byteRemainder == 2) {
-        chunk = (bytes[mainLength] << 8) | bytes[mainLength+1];
-        a = (chunk & 16128) >> 8;
-        b = (chunk & 1008) >> 4;
-        c = (chunk & 15) << 2;
-        base64 += encodings[a]+encodings[b]+encodings[c]+'=';
-    }
-    return "data:image/png;base64,"+base64;
 }
 // Models
 function Customer(obj) {
@@ -1216,12 +1220,13 @@ var ff = new FatFractal();
 ff.setAutoLoadRefs(true);
 ff.setAutoLoadBlobs(false);
 ff.setDebug(false);
-// This will create the correct size for the graph data
+// Global variables
 var G_DEBUG = ff.getDebug();
 var G_CUSTOMER;
 var G_ORDERS;
 var G_ORDERLINES;
 var G_FFDL;
+// Tab Navigation
 $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
     if (G_DEBUG) console.log('Active Tab ' + e.target); // Active Tab
     var st = e.target.id;
@@ -1231,7 +1236,7 @@ $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
             if (G_DEBUG) console.log('Selected Tab ' + st); // Active Tab
             var ele = document.getElementById('orders-permissions-response-graph');
             ele.innerHTML = "";
-            if(!G_ORDERS || G_ORDERS.length <=0) ele.innerHTML = "Please select some orders first..."
+            if(!G_ORDERS || G_ORDERS.length <=0) ele.innerHTML = "Please select a user above..."
             else {
                 var graphData = GetGraphData(G_ORDERS);
                 if(graphData) {
@@ -1244,7 +1249,7 @@ $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
             if (G_DEBUG) console.log('Selected Tab ' + st); // Active Tab
             var ele = document.getElementById('customer-response-graph');
             ele.innerHTML = "";
-            if(!G_CUSTOMER) ele.innerHTML = "Please select a Customer first..."
+            if(!G_CUSTOMER) ele.innerHTML = 'Please click "Try it!" above...';
             else {
                 var graphData = GetGraphData(G_CUSTOMER);
                 if(graphData) {
@@ -1270,9 +1275,9 @@ $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
             if (G_DEBUG) console.log('Selected Tab ' + st); // Active Tab
             var ele = document.getElementById('ffdl-response-graph');
             ele.innerHTML = "";
-            if(!G_FFDL || G_FFDL.length <=0) ele.innerHTML = "Please select some ffdl first..."
+            if(!G_FFDL || G_FFDL.length <=0) ele.innerHTML = 'Please click "Try it!" above...'
             else {
-                var graphData = GetFFDLGraphData(G_FFDL);
+                var graphData = ShowFFDLGraphData(G_FFDL);
                 if(graphData) {
                     ele.style.width = "800px";
                     ele.style.height = "600px";
@@ -1283,6 +1288,12 @@ $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
     } else {
         console.log("tab does not have an id set");
     }
+});
+// Spinner
+$(function(){
+    $('a, button').click(function() {
+        $(this).toggleClass('active');
+    });
 });
 </script>
 </html>

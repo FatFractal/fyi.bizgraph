@@ -310,7 +310,7 @@ exports.createSomeProducts = function() {
     {mfg:"Zojurushi",sku:"B0074CDG6C",description:"Zojirushi NS-TSC10 5-1/2-Cup (Uncooked) Micom Rice Cooker and Warmer, 1.0-Liter",model:"NS-TSC10",weight:10,picture:"http://ecx.images-amazon.com/images/I/41VHslnju%2BL.jpg",type:"image/jpg"},
     {mfg:"Epson",sku:"B00CBAPEYE",description:"Epson Expression Home XP-410 Small-in-One All-in-One Wireless Inkjet Printer",model:"C11CC87201",weight:11.6,picture:"http://ecx.images-amazon.com/images/I/4101unRBoFL.jpg",type:"image/jpg"},
     {mfg:"Shark",sku:"B004Q4DRJW",description:"Shark Navigator Lift-Away Vacuum",model:"NV352",weight:19.4,picture:"http://ecx.images-amazon.com/images/I/51epS5eORkL._SL1500_.jpg",type:"JPG"},
-    {mfg:"Stoneline",sku:"B00E9BYFIE",description:"Stoneline PFOA Free Nonstick Stone Cookware - Classic 8-Piece Set",model:"Classic8",weight:19.4,picture:"http://ecx.images-amazon.com/images/I/51epS5eORkL._SL1500_.jpg",type:"image/jpg"},
+    {mfg:"Stoneline",sku:"B00E9BYFIE",description:"Stoneline PFOA Free Nonstick Stone Cookware - Classic 8-Piece Set",model:"Classic8",weight:19.4,picture:"http://ecx.images-amazon.com/images/I/81FWY5So8mL._SX522_.jpg",type:"image/jpg"},
     {mfg:"Zojurushi",sku:"B00BSEYJ3Q",description:"Zojirushi BB-CEC20 Home Bakery Supreme 2-Pound-Loaf Breadmaker",model:"BB-CEC20",weight:25.2,picture:"http://ecx.images-amazon.com/images/I/71adJp2DTPL._SL1500_.jpg",type:"image/jpg"}
     ];
     var count = 0;
