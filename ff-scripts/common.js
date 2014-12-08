@@ -15,7 +15,7 @@ var collections = [
     {collection:"Vendors",objecttype:"Vendor",virtual:false},
     {collection:"Manufacturers",objecttype:"Manufacturer",virtual:false},
     {collection:"Addresses",objecttype:"Address",virtual:false},
-    {collection:"Accounts",objecttype:"Account",virtual:false},
+    // {collection:"Accounts",objecttype:"Account",virtual:false},
     {collection:"PaymentMethods",objecttype:"PaymentMethod",virtual:false},
     {collection:"ProductImages",objecttype:"ProductImage",virtual:false},
     {collection:"Avatars",objecttype:"Avatar",virtual:false},
