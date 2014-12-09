@@ -49,7 +49,7 @@
             <p>This post demonstrates real examples of working with FatFractal's datagraph with more of an enterprise feel.
             </p>
             <h4>You can see the data created by this app using the FatFractal DataBrowser (
-                <a href = https://beta.fatfractal.com/databrowser/databrowser.html?baseUrl=https://fyi.fatfractal.com/bizgraph target = _blank>
+                <a onclick="ShowDataBrowser()">
                     here
                 </a>
                 )
@@ -1006,6 +1006,14 @@ function ShowCustomerGraph() {
         el.innerHTML = "<br><div class = 'well red'>Got a login error: "+msg+"</div>";
         console.error("ShowCustomerGraph.login() Error: "+code+" "+msg);
     });
+}
+function ShowDataBrowser() {
+    var h = window.location.host;
+    var p = window.location.protocol;
+    p = p.substring(0, p.length - 1);
+    var db = "https://beta.fatfractal.com/databrowser/index.html#/"+p+"/"+h+"/bizgraph/";
+    if (G_DEBUG) console.log('DataBrowser URL: ' + db);
+    window.open(db);
 }
 // Models
 function Customer(obj) {
